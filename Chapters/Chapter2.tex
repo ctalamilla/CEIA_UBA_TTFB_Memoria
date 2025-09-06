@@ -1,0 +1,191 @@
+\chapter{Introducción específica} % Main chapter title
+
+\label{Chapter2}
+
+%----------------------------------------------------------------------------------------
+%	SECTION 1
+%----------------------------------------------------------------------------------------
+En este capítulo se presenta una introducción técnica a la temática abordada en el trabajo. 
+
+\section{Requerimientos}
+\label{sec:ejemplo}
+A continuación, se detallan los principales requerimientos funcionales y técnicos.
+
+\subsection*{Requerimientos funcionales}
+
+\begin{itemize}
+\item Obtener series temporales de cobertura de agua superficial en el Salar de Llullaillaco, a partir de índices espectrales derivados de imágenes Landsat.
+\item Correlacionar los patrones de presencia de agua con variables climáticas globales asociadas al ENSO (Niño 3.4, SOI, MEI).
+\item Generar modelos predictivos de ocurrencia de agua mediante el uso algoritmos de aprendizaje supervisado.
+\item Visualizar los resultados mediante mapas y gráficos temporales que permitan interpretar los patrones hidrológicos en relación con el clima.
+\end{itemize}
+
+\subsection*{Requerimientos técnicos}
+
+\begin{itemize}
+\item Acceso a la plataforma Google Earth Engine (GEE) para el procesamiento de imágenes satelitales Landsat 5, 7 y 8.
+\item Dataset mensual de los índices climáticos de ENSO: Niño 3.4, \textit{Southern Oscillation Index (SOI)}, y \textit{Multivariate ENSO Index (MEI)}.
+\item Computadora con entorno de desarrollo Python, con acceso a bibliotecas como PANDAS, NUMPY, MATPLOTLIB, SKLEARN, TORCH.
+\item Conexión a INTERNET para descarga de datos y acceso a \textit{notebooks} en la nube.
+\end{itemize}
+
+
+
+%----------------------------------------------------------------------------------------
+%	SECTION 2
+%----------------------------------------------------------------------------------------
+
+\section{Técnicas utilizadas}
+
+El desarrollo de este trabajo se basa en la combinación de técnicas de teledetección, análisis multitemporal y aprendizaje automático, integradas en un flujo de trabajo que permite monitorear la presencia de agua superficial en el Salar de Llullaillaco y explorar su relación con la variabilidad climática regional.
+
+\subsection*{Google Earth Engine (GEE)}
+
+Se utilizó la plataforma GEE para el acceso y procesamiento de imágenes Landsat 5, 7 y 8, con el mismo enfoque usado por \cite{ferran2024ceia, roldan2023ceia}. GEE permite aplicar filtros temporales, máscaras de nubes, recortes espaciales y cálculos de índices espectrales sobre áreas definidas, con eficiencia y escalabilidad.
+
+
+\subsection*{Sobre los índices espectrales}
+
+El índice espectral utilizado en este trabajo fue el NDWI (\textit{Normalized Difference Water Index}). Este índice se basa en relaciones matemáticas entre bandas del espectro electromagnético que capturan variaciones en la reflectancia del terreno. Estas métricas se fundamentan en estudios de respuesta espectral diferencial de distintos tipos de cobertura superficial, como agua, vegetación o nieve, especialmente visibles en las bandas verde, roja, infrarroja cercana (NIR) y de onda corta (SWIR).
+
+Tal como se observa en trabajos clásicos de teledetección \cite{tucker1979red, huete1988soil}, la vegetación sana refleja fuertemente en el infrarrojo cercano y absorbe en la banda roja, mientras que el agua y la nieve presentan perfiles espectrales contrastantes. Estas propiedades permiten construir índices que destacan las coberturas de interés.
+
+
+En este trabajo se usó principalmente NDWI como un marco conceptual útil para entender las diferencias espectrales de las cubiertas superficiales analizadas en el Salar de Llullaillaco.
+
+
+\subsection*{Índices espectrales utilizados}
+
+Los índices seleccionados permiten caracterizar el comportamiento espectral del suelo y del agua en ambientes de alta reflectancia como los salares:
+A continuación se presentan los índices espectrales utilizados para la detección y clasificación de coberturas en imágenes satelitales:
+
+\begin{itemize}
+    \item NDWI: resalta la presencia de agua superficial ya que emplea las bandas del verde y el infrarrojo cercano (NIR). Su expresión matemática se observa en la ecuación \ref{eq:ndwi}:
+
+    \begin{equation}
+        \label{eq:ndwi}
+        NDWI = \frac{\text{Green} - \text{NIR}}{\text{Green} + \text{NIR}}
+    \end{equation}
+
+\end{itemize}
+
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[scale=.5]{Figures/fig3.png}
+	\caption{Reflectancias espectrales de suelo seco, suelo húmedo y vegetación completamente verde\protect\footnotemark.}
+	\label{fig:palabraIngles}
+\end{figure}
+
+\footnotetext{Imagen tomada de \cite{tucker1979red}.}}
+
+
+\subsection*{Imágenes Landsat utilizadas}
+
+Para este trabajo se emplearon imágenes ópticas de las misiones \Landsat 5 TM, Landsat 7 ETM+ y Landsat 8 OLI, disponibles en la plataforma GEE como colecciones. Las colecciones empleadas de Google Earth Engine fueron:
+
+\begin{itemize}
+    \item \texttt{LANDSAT/LT05/C02/T1\_L2} — Landsat 5 TM, colección nivel 2 (surface reflectance).
+    \item \texttt{LANDSAT/LE07/C02/T1\_L2} — Landsat 7 ETM+, colección nivel 2.
+    \item \texttt{LANDSAT/LC08/C02/T1\_L2} — Landsat 8 OLI, colección nivel 2.
+\end{itemize}
+
+Estas imágenes corresponden a productos de nivel 2, que incluyen correcciones atmosféricas (Surface Reflectance) y enmascaramiento de nubes mediante algoritmos QA/QC. Se seleccionaron todas las escenas disponibles y se priorizaron aquellas sin nubes y con cobertura adecuada del Salar de Llullaillaco.
+
+Las bandas empleadas en los cálculos de índices espectrales fueron:
+
+\begin{itemize}
+    \item Landsat 5 TM:
+    \begin{itemize}
+        \item Green: Band 2 (0,52–0,60 µm)
+        \item Red: Band 3 (0,63–0,69 µm)
+        \item NIR: Band 4 (0,76–0,90 µm)
+        \item SWIR1: Band 5 (1,55–1,75 µm)
+    \end{itemize}
+    
+    \item Landsat 7 ETM+:
+    \begin{itemize}
+        \item Green: Band 2 (0,52–0,60 µm)
+        \item Red: Band 3 (0,63–0,69 µm)
+        \item NIR: Band 4 (0,77–0,90 µm)
+        \item SWIR1: Band 5 (1,55–1,75 µm)
+    \end{itemize}
+
+    \item Landsat 8 OLI:
+    \begin{itemize}
+        \item Green: Band 3 (0,53–0,59 µm)
+        \item Red: Band 4 (0,64–0,67 µm)
+        \item NIR: Band 5 (0,85–0,88 µm)
+        \item SWIR1: Band 6 (1,57–1,65 µm)
+    \end{itemize}
+\end{itemize}
+
+
+Estas bandas fueron utilizadas para calcular el ìndice NDWI. Se ajustaron las combinaciones de las mismas según el sensor. La consistencia intersensorial fue manejada a través de normalización espectral mensual y máscaras de calidad provistas por GEE.
+
+\subsection*{Variables climáticas ENSO}
+
+El fenómeno El Niño-Oscilación del Sur (ENSO) es uno de los principales moduladores del clima a escala interanual, y tiene un impacto significativo en los regímenes de precipitación y temperatura en América del Sur. ENSO es un sistema acoplado océano-atmósfera que alterna entre tres fases:
+
+\begin{itemize}
+    \item {El Niño: fase cálida, asociada a un aumento de la temperatura superficial del mar (SST) en el Pacífico ecuatorial central y oriental.
+    \item La Niña: fase fría, caracterizada por anomalías negativas de SST en la misma región.
+    \item Neutral: ausencia de anomalías significativas en las condiciones oceánicas y atmosféricas.
+\end{itemize}
+
+Estas variaciones alteran la circulación atmosférica a nivel planetario, por ejemplo la intensidad de los vientos alisios, el transporte de humedad, y la posición de la Zona de Convergencia Intertropical (ZCIT). En regiones como la Puna argentina, se ha documentado que las fases de ENSO afectan directamente los patrones de precipitación y, por ende, la disponibilidad de agua superficial y la recarga de los salares.
+
+Para capturar cuantitativamente la influencia de ENSO, en este trabajo se utilizaron tres índices climáticos de carácter mensual:
+
+\begin{itemize}
+    \item Niño 3.4 Index (ONI): representa la anomalía mensual de la temperatura superficial del mar en la región 5°N–5°S, 170°W–120°W. Es la métrica más común para definir la fase cálida (El Niño) o fría (La Niña) de ENSO \cite{nino34index}.
+
+    \item Southern Oscillation Index (SOI): calculado a partir de la diferencia de presión atmosférica entre Tahití y Darwin. Un valor negativo indica condiciones de El Niño, mientras que uno positivo sugiere La Niña \cite{soiindex}.
+
+    \item Multivariate ENSO Index (MEI.v2): combina variables atmosféricas y oceánicas (SST, presión, viento zonal y meridional, etc.) en un índice multivariado más robusto \cite{meiindex}.
+\end{itemize}
+
+Estos indicadores se obtuvieron de fuentes oficiales como la \textit{NOAA Climate Prediction Center} y el \textit{Physical Sciences Laboratory} de EE.UU. y fueron alineados mensualmente con las series de datos espectrales obtenidas de imágenes Landsat, en el período 2000–2024.
+
+Incluir estos índices como variables explicativas permite explorar la posible relación entre eventos ENSO y la presencia de agua superficial en el Salar de Llullaillaco, se aporta una perspectiva climática regional al análisis hidrológico local.
+
+%----------------------------------------------------------------------------------------
+%	SECTION 3
+%----------------------------------------------------------------------------------------
+
+\section{Herramientas y bibliotecas utilizadas}
+
+
+\subsection*{Entornos de trabajo}
+
+\begin{itemize}
+    \item Google Earth Engine (GEE): utilizada para acceder, filtrar y procesar imágenes Landsat. 
+    
+    \item Google Colab: facilita la integración con GEE mediante exportación de datos, así como la implementación de modelos de \textit{machine learning} sin necesidad de recursos locales avanzados.
+
+    \item Python 3.10: lenguaje principal utilizado para análisis de datos, entrenamiento de modelos, generación de gráficos y administración de \textit{workflows}.
+\end{itemize}
+
+
+\subsection*{Bibliotecas y frameworks}
+
+Las siguientes bibliotecas fueron utilizadas en distintas etapas del flujo de trabajo:
+
+\begin{itemize}
+    \item \texttt{PANDAS}: manipulación de estructuras tabulares y series temporales. Versión 1.5.3.
+    \item \texttt{NUMPY}: operaciones numéricas vectorizadas y manejo eficiente de arreglos multidimensionales. Versión 1.24.3.
+    \item \texttt{MATPLOTLIB} y \texttt{SEABORN}: generación de gráficos, visualización de tendencias temporales y resultados de modelos. Versiones 3.6.2 y 0.12.2 respectivamente.
+    \item \texttt{SCIKIT-LEARN}: implementación de modelos Random Forest, validación cruzada, métricas de clasificación y selección de variables. Versión 1.1.3.
+    \item \texttt{PYTORCH}: entrenamiento de redes neuronales profundas, arquitectura multicapa y optimización basada en descenso de gradiente. Versión 2.0.1.
+    \item \texttt{PYTHON}: lenguaje principal utilizado para análisis de datos, entrenamiento de modelos, generación de gráficos y administración de workflows. Versión 3.10.
+    \item \texttt{Google Eart Engine}: plataforma web de procesamiento satelital utilizada para acceder, filtrar y procesar imágenes Landsat, y calcular índices espectrales. API JS (Web) y API Python versión 0.1.365.
+    \item \texttt{Google Colab}: entorno de ejecución en la nube usado para integración con GEE y entrenamiento de modelos. Versión utilizada: mayo 2025.
+\end{itemize}
+
+
+
+Además, se utilizaron funciones propias escritas en Python para carga de datos, limpieza, ingeniería de variables y evaluación de modelos.
+
+
+
+%----------------------------------------------------------------------------------------
