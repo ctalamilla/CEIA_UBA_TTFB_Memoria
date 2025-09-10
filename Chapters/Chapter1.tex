@@ -92,6 +92,9 @@ Asimismo, Ferrán \cite{ferran2024ceia} integró imágenes Sentinel-2 con datos 
 
 De forma complementaria, Tentor \cite{tentor2023ceiot} desarrolló una plataforma web para la integración y visualización de datos de humedad de suelo, donde se combinan sensores IoT con imágenes satelitales y técnicas de fusión de datos. Su enfoque orientado a toma de decisiones en el ámbito agronómico puede ser extrapolado a problemáticas ambientales como la gestión de recursos hídricos en zonas de extracción minera.
 
+A nivel metodológico, la segmentación semántica con redes convolucionales tipo U-Net se ha vuelto estándar para delinear objetos en alta resolución, reduciendo errores en bordes y heterogeneidad espectral cuando se dispone de etiquetas de calidad. Más recientemente, emergieron enfoques que evitan la anotación manual mediante \emph{knowledge distillation} (esquema \emph{teacher–student}) entre modalidades. En particular, trabajos como \emph{DeepAqua} proponen usar un \emph{teacher} óptico (máscara NDWI) para supervisar un \emph{student} entrenado sobre imágenes SAR, tras co-registro espacial y temporal, optimizando pérdidas tipo Dice/BCE contra la máscara del \emph{teacher}. Este paradigma permite aprender a partir de etiquetas proxy y aporta robustez frente a nubosidad y condiciones atmosféricas, mostrando mejoras en la capacidad para detectar agua abierta y vegetada \cite{DeepAqua2023}.
+
+
 En conjunto, estos antecedentes muestran que existe una base metodológica consolidada para integrar imágenes satelitales, análisis multitemporal e inteligencia artificial en estudios de carácter ambiental y productivo. Sin embargo, aún son escasos los trabajos aplicados específicamente a los salares altoandinos del noroeste argentino, lo que refuerza la pertinencia y originalidad del presente estudio.
 
 
@@ -99,13 +102,14 @@ En conjunto, estos antecedentes muestran que existe una base metodológica conso
 
 \section{Objetivos y alcance}
 
-Analizar los patrones temporales de ocurrencia de agua superficial en el Salar de Llullaillaco a partir de imágenes Landsat, e investigar su relación con variables climáticas globales asociadas al fenómeno ENSO mediante técnicas de teledetección, análisis de series temporales.
+El objetivo es analizar los patrones temporales de ocurrencia de agua superficial en el Salar de Llullaillaco a partir de imágenes Landsat, e investigar su relación con variables climáticas globales asociadas al fenómeno ENSO mediante técnicas de teledetección, análisis de series temporales.
 
 Dentro de los objetivos específicos, se pueden mencionar los siguientes:
 
 \begin{itemize}
     \item Generar series temporales de índices espectrales (NDWI) a partir de imágenes Landsat 5, 7 y 8 para identificar zonas con presencia estacional o persistente de agua superficial.
     \item Preprocesar y normalizar variables climáticas relevantes (Niño 3.4, SOI, MEI) para su análisis conjunto con los datos satelitales.
+    \item Desarrollar e integrar un pipeline de distillation (NDWI-teacher → U-Net-student) para mapear agua en  a partir de sensores ópticos y comparar contra enfoques estadísticos (SARIMA/VAR).
     \item Integrar y correlacionar los índices espectrales con series mensuales de indicadores climáticos globales (Niño 3.4, SOI, MEI) para evaluar relaciones potenciales.
     \item Aplicar modelos de análisis de series temporales (SARIMA y VAR) y pruebas de causalidad de Granger para identificar dependencias y relaciones dinámicas entre las variables.
     \item Entrenar y evaluar modelos de aprendizaje automático para generar predicciones exploratorias sobre la ocurrencia de agua superficial.

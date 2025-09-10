@@ -3,10 +3,7 @@
 \chapter{Conclusiones} % Main chapter title
 
 \label{Chapter5} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
-Todos los capítulos deben comenzar con un breve párrafo introductorio que indique cuál es el contenido que se encontrará al leerlo.  La redacción sobre el contenido de la memoria debe hacerse en presente y todo lo referido al proyecto en pasado, siempre de modo impersonal.
-
-
-%----------------------------------------------------------------------------------------
+Este capítulo presenta las conclusiones generales del trabajo, resumiendo los aportes más relevantes obtenidos y el grado de cumplimiento de los objetivos planteados. Asimismo, se incluyen observaciones sobre la planificación y los riesgos, y se señalan posibles líneas de desarrollo futuro. 
 
 %----------------------------------------------------------------------------------------
 %	SECTION 1
@@ -14,24 +11,35 @@ Todos los capítulos deben comenzar con un breve párrafo introductorio que indi
 
 \section{Conclusiones generales }
 
-La idea de esta sección es resaltar cuáles son los principales aportes del trabajo realizado y cómo se podría continuar. Debe ser especialmente breve y concisa. Es buena idea usar un listado para enumerar los logros obtenidos.
-
-En esta sección no se deben incluir ni tablas ni gráficos.
-
-Algunas preguntas que pueden servir para completar este capítulo:
+El trabajo realizado permitió analizar la dinámica temporal de la superficie de agua en el Salar de Llullaillaco y su relación con los principales índices climáticos del fenómeno ENSO (ONI, SOI y MEI). A partir de la planificación inicial y las pruebas desarrolladas, se alcanzaron los siguientes logros y hallazgos principales:
 
 \begin{itemize}
-\item ¿Cuál es el grado de cumplimiento de los requerimientos?
-\item ¿Cuán fielmente se puedo seguir la planificación original (cronograma incluido)?
-\item ¿Se manifestó algunos de los riesgos identificados en la planificación? ¿Fue efectivo el plan de mitigación? ¿Se debió aplicar alguna otra acción no contemplada previamente?
-\item Si se debieron hacer modificaciones a lo planificado ¿Cuáles fueron las causas y los efectos?
-\item ¿Qué técnicas resultaron útiles para el desarrollo del proyecto y cuáles no tanto?
+    \item Se construyó una serie temporal mensual continua de la superficie de agua (1984--2022), aplicando un enfoque híbrido de interpolación y promedios estacionales para cubrir vacíos, lo que garantizó la homogeneidad requerida para el modelado.
+    \item Se comprobó que las series climáticas ONI, SOI y MEI son estacionarias, mientras que el Área requirió diferenciación. Esta etapa de preprocesamiento fue clave para asegurar la robustez de los modelos posteriores.
+    \item Los modelos SARIMA mostraron buen desempeño predictivo en general, destacándose el ajuste sobre la serie diferenciada (\emph{Área\_diff}) con errores mínimos y residuos consistentes con ruido blanco. El caso del SOI presentó mayores dificultades, reflejando su alta variabilidad.
+    \item El modelo VAR(3) permitió capturar interdependencias multivariadas. Se confirmó la fuerte relación entre ONI, SOI y MEI, mientras que el SOI emergió como variable clave al mostrar causalidad directa sobre el Área.
+    \item La prueba de causalidad de Granger evidenció relaciones significativas entre los índices ENSO y, en particular, que el SOI es el único con influencia estadísticamente significativa sobre la superficie de agua.
+    \item El análisis de respuesta al impulso mostró que perturbaciones en SOI afectan tanto a los índices oceánicos como al Área, reforzando su rol como modulador atmosférico de la hidrología altoandina.
+    \item Se cumplió la mayoría de los requisitos planteados en la planificación: descarga y procesamiento de imágenes satelitales, construcción de series homogéneas, modelado SARIMA/VAR, validación de resultados y visualización de mapas y gráficos. Permanecieron en progreso la formalización de métricas de precisión categórica y las pruebas cruzadas con imágenes Sentinel-2.
+    \item Los riesgos identificados inicialmente (como la falta de datos satelitales o errores en índices) no se materializaron de manera crítica, y las medidas de mitigación fueron efectivas. El mayor desafío se concentró en la alta variabilidad de las series ENSO y en la necesidad de preprocesamiento riguroso.
 \end{itemize}
 
+En síntesis, el trabajo permitió validar la hipótesis inicial: la variabilidad climática global asociada al ENSO, en especial la expresada por el SOI, constituye un factor determinante en la dinámica hídrica del Salar de Llullaillaco.
 
 %----------------------------------------------------------------------------------------
 %	SECTION 2
 %----------------------------------------------------------------------------------------
+
 \section{Próximos pasos}
 
-Acá se indica cómo se podría continuar el trabajo más adelante.
+El proyecto abre la posibilidad de ampliar y profundizar el análisis en varias direcciones:
+
+\begin{itemize}
+    \item Extender la metodología a otros salares de la Puna argentina y del altiplano sudamericano, para evaluar la consistencia regional de los hallazgos.
+    \item Incorporar nuevos sensores satelitales (p.ej., Sentinel-2 o MODIS) que aporten mayor resolución temporal y espectral, permitiendo mejorar la detección de cuerpos de agua de menor tamaño.
+    \item Explorar el uso de técnicas de inteligencia artificial avanzadas, como redes neuronales recurrentes (LSTM, GRU) o arquitecturas basadas en \textit{transformers}, para capturar dependencias no lineales y patrones complejos en las series temporales.
+    \item Profundizar el análisis de incertidumbre, integrando modelos VAR con errores heterocedásticos (VAR-GARCH) o distribuciones no gaussianas para mejorar la representación de colas pesadas y eventos extremos.
+    \item Evaluar la integración de variables hidrometeorológicas locales (precipitación, temperatura, evapotranspiración) cuando estén disponibles, con el fin de enriquecer los modelos predictivos y la comprensión de los procesos.
+\end{itemize}
+
+En conjunto, estos pasos permitirán robustecer la base metodológica desarrollada y avanzar hacia herramientas predictivas operativas que apoyen la gestión ambiental y la toma de decisiones en ecosistemas sensibles de altura.
