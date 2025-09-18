@@ -3,13 +3,58 @@
 \chapter{Ensayos y resultados} % Main chapter title
 
 \label{Chapter4} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
-En este capítulo se presentan los procedimientos aplicados para el análisis del Salar de Llullaillaco, desde la delimitación del área de estudio y la construcción de las series temporales, hasta la aplicación de modelos estadísticos y multivariados. Se describen los pasos realizados para garantizar la continuidad de los datos y se incluyen las pruebas necesarias para evaluar su idoneidad como series de tiempo. Finalmente, se exponen los principales resultados obtenidos con los modelos utilizados, destacando la relación entre la variabilidad climática regional y la dinámica hidrológica del salar.
+En este capítulo se presentan los resultados obtenidos de los ensayos realizados, los cuales incluyen, pero no se limitan a: resultado de la segmentación CNN U-Net. para la obtención de la serie temporal de superficie de agua de la laguna, resultados de modelado SARIMA para todas las series temporales estudiadas, resultado del modelado VAR y por último los resultados de la aplicación de rolling forecasting a las variables área. 
 
 %----------------------------------------------------------------------------------------
 %	SECTION 1
 %----------------------------------------------------------------------------------------
 
+\section{Segmentación mensual con U-Net: resultados operativos}
 
+La segmentación automática de cuerpos de agua se implementó con una arquitectura U-Net \citep{ronneberger2015unet} entrenada bajo el esquema \textit{student–teacher} \citep{hinton2015distilling}. El objetivo fue obtener una serie mensual continua de cobertura de agua superficial, evitando la necesidad de etiquetado manual masivo. Para ello, se empleó un 5\% de las imágenes del cubo temporal mensual, generando las etiquetas a partir del NDWI umbralizado ($>0,15$). El modelo resultante se aplicó a la totalidad de imágenes del período 1984–2022.
+
+\subsection{Curvas de entrenamiento y validación}
+En la figura~\ref{fig:unet_training} se muestran las curvas de entrenamiento y validación de la red U-Net, utilizando como función de pérdida la \textit{Binary Cross Entropy} (BCE). Se observa una disminución rápida de la pérdida durante las primeras 15 épocas, seguida de una convergencia estable hacia valores próximos a cero. La similitud entre las curvas de entrenamiento y validación indica un buen equilibrio entre ajuste y generalización, sin evidencias de sobreajuste. El mejor desempeño en validación se alcanzó en la época 78, lo que confirma la capacidad del modelo para segmentar de manera consistente las áreas de agua a partir de las imágenes Landsat.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.55]{Figures/curva_entrenamiento.png}
+    \caption{Curvas de entrenamiento y validación de la U-Net.}
+    \label{fig:unet_training}
+\end{figure}
+
+\subsection{Ejemplos de segmentación}
+La figura~\ref{fig:unet_examples} muestra ejemplos representativos de la segmentación mensual: a la izquierda las imágenes Landsat en composición RGB de falso color, y a la derecha las máscaras binarias generadas por la U-Net. Se aprecia coherencia espacial en la identificación de cuerpos de agua, con detección consistente de la laguna central y reducción de falsos positivos respecto de umbrales simples de NDWI.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.32]{Figures/unet_examples.png}
+    \caption{Ejemplos de segmentación mensual: comparación entre imágenes Landsat (falso color) y máscaras U-Net.}
+    \label{fig:unet_examples}
+\end{figure}
+
+\subsection{Consistencia temporal}
+La figura ~\ref{fig:ts_final} ilustra la serie temporal del área de agua derivada de la segmentación U-Net. La dinámica temporal reproduce patrones estacionales y anomalías coherentes con la climatología regional, validando la estabilidad del procedimiento. Esta serie constituye la base de los modelos de predicción temporal desarrollados en las secciones SARIMA.
+
+\subsection{Probabilidad mensual de agua}
+
+A partir del cubo temporal clasificado con la U-Net se calculó, para cada mes del período de análisis, la probabilidad de ocurrencia de agua. Este cálculo se realizó como la proporción de píxeles clasificados como agua sobre el total de píxeles de la laguna en el mes correspondiente. De esta manera, se obtuvo una serie temporal mensual de probabilidades que permite evaluar la consistencia del modelo y la dinámica hidrológica en escalas estacionales e interanuales.
+
+En la figura~\ref{fig:prob_agua_mensual} se presenta un ejemplo gráfico de estos resultados. Se observa la variabilidad temporal de la probabilidad de agua, con máximos que coinciden con períodos de mayor extensión superficial y mínimos en fases de retracción. Este producto constituye un insumo clave para la modelización temporal desarrollada en los capítulos siguientes, pues resume la dinámica de la laguna en una métrica probabilística derivada de la clasificación automática.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.31]{Figures/prob_agua1.png}
+    \caption{Probabilidad mensual de ocurrencia de agua en la laguna Llullaillaco, derivada de la segmentación U-Net.}
+    \label{fig:prob_agua_mensual}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.31]{Figures/prob_agua2.png}
+    \caption{Probabilidad mensual de ocurrencia de agua en la laguna Llullaillaco, derivada de la segmentación U-Net.}
+    \label{fig:prob_agua_mensual2}
+\end{figure}
 
 \section{Modelado con SARIMA}
 
@@ -87,17 +132,7 @@ simplificar la parte estacional (evaluar ARIMA$(2,0,1)$ sin estacionalidad) y re
 residuos.
 \vspace{0.3em}
 
-\begin{figure}[H]\centering
-\includegraphics[scale=.30]{Figures/res_sarima_oni.png}
-\caption{ONI: residuos del modelo SARIMA.}
-\label{fig:res_oni}
-\end{figure}
 
-\begin{figure}[H]\centering
-\includegraphics[scale=.42]{Figures/pred_oni.png}
-\caption{ONI: observado (train+test) vs. predicciones con IC 95\%.}
-\label{fig:pred_oni}
-\end{figure}
 
 
 \subsubsection{SOI}
@@ -108,19 +143,6 @@ no normalidad. En test: MSE $=88.00$, MAE $=7.64$, RMSE $=9.38$. En las figuras~
 
 Conclusión: desempeño predictivo insuficiente para la escala del SOI. Es conveniente simplificar y eliminar términos no significativos además de explorar transformaciones robustas.
 \vspace{0.3em}
-
-\begin{figure}[H]\centering
-\includegraphics[scale=.30]{Figures/res_sarima_soi.png}
-\caption{SOI: residuos del modelo SARIMA.}
-\label{fig:res_soi}
-\end{figure}
-
-
-\begin{figure}[H]\centering
-\includegraphics[scale=.42]{Figures/pred_soi.png}
-\caption{SOI: observado (train+test) vs. predicciones con IC 95\%.}
-\label{fig:pred_soi}
-\end{figure}
 
 
 \subsubsection{MEI}
@@ -134,19 +156,6 @@ Conclusión: buen comportamiento predictivo. En trabajos futuros seria oportuno 
 la estacionalidad (p.\,ej., SARIMA$(2,0,1)\times(1,1,0)_{12}$) y verificar residuos.
 \vspace{0.3em}
 
-\begin{figure}[H]\centering
-\includegraphics[scale=.30]{Figures/res_sarima_mei.png}
-\caption{MEI: residuos del modelo SARIMA.}
-\label{fig:res_mei}
-\end{figure}
-
-
-\begin{figure}[H]\centering
-\includegraphics[scale=.42]{Figures/pred_mei.png}
-\caption{MEI: observado (train+test) vs. predicciones con IC 95\%.}
-\label{fig:pred_mei}
-\end{figure}
-
 
 \subsubsection{Área (sin diferenciar)}
 Modelo SARIMA$(1,0,0)\times(1,0,1)_{12}$ 
@@ -158,20 +167,6 @@ En test: MSE $=0,02499$, MAE $=0,119$, RMSE $=0,158$. En las figuras~\ref{fig:re
 Conclusión: buen ajuste en escala de la serie; aun así, la magnitud de AR estacional sugiere evaluar un $D=1$ para mayor estabilidad.
 \vspace{0.3em}
 
-\begin{figure}[H]\centering
-\includegraphics[scale=.30]{Figures/res_sarima_area.png}
-\caption{Área: residuos del modelo SARIMA.}
-\label{fig:res_area}
-\end{figure}
-
-
-
-\begin{figure}[H]\centering
-\includegraphics[scale=.42]{Figures/pred_area.png}
-\caption{Área: observado (train+test) vs. predicciones con IC 95\%.}
-\label{fig:pred_area}
-\end{figure}
-
 
 \subsubsection{Área\_diff (diferenciada)}
 Modelo SARIMA$(2,0,1)\times(1,0,1)_{12}$
@@ -181,18 +176,6 @@ MSE $=0.01782$, MAE $=0,0910$, RMSE $=0,1335$, MAPE $=1,70\%$. En las figuras~\r
 
 Conclusión:buen desempeño y mayor robustez estadística tras la diferenciación esto valida el preprocesamiento efectuado (ver sección de raíces unitarias).
 
-\begin{figure}[H]\centering
-\includegraphics[scale=.30]{Figures/res_sarima_area_d.png}
-\caption{Área (diferenciada): residuos del modelo SARIMA.}
-\label{fig:res_area_d}
-\end{figure}
-
-
-\begin{figure}[H]\centering
-\includegraphics[scale=.42]{Figures/pred_area_d.png}
-\caption{Área (diferenciada): observado (train+test) vs. predicciones con IC 95\%.}
-\label{fig:pred_area_d}
-\end{figure}
 
 En la tabla~\ref{tab:metricas_sarima} se pueden observar las métricas para los modelos SARIMA para variables analizadas. 
 
@@ -331,13 +314,6 @@ Por ultimo, se aplicó el test de normalidad basado en asimetría y curtosis. La
 \subsubsection{Predicciones}
 En la figura~\ref{fig:var_pred} se presentan las predicciones del modelo VAR comparadas con los valores observados. Se observa que el modelo logra capturar adecuadamente la evolución de ONI y MEI, mientras que en SOI las oscilaciones extremas resultan más difíciles de reproducir. En el caso del Área, las predicciones se mantienen dentro de un rango consistente, aunque con menor variabilidad que la observada.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.45]{Figures/var_pred.png}
-    \caption{Predicciones del modelo VAR(3) frente a los valores reales de ONI, SOI, MEI y Área.}
-    \label{fig:var_pred}
-\end{figure}
-
 \subsubsection{Respuestas al impulso}
 Las funciones de respuesta al impulso (IRF) permiten evaluar cómo un shock en una variable afecta a las demás dentro del sistema (figura~\ref{fig:var_irf}). Los resultados indican que:
 
@@ -357,6 +333,122 @@ Las funciones de respuesta al impulso (IRF) permiten evaluar cómo un shock en u
 
 \subsubsection{Conclusión parcial}
 El modelo VAR(3) confirma la fuerte interrelación entre los índices ENSO (ONI, SOI, MEI) y muestra que la superficie de agua está particularmente influenciada por el SOI. Este resultado es consistente con la prueba de causalidad de Granger y con la lógica climática subyacente: la variabilidad atmosférica medida por el SOI tiene un efecto directo en la dinámica hidrológica del sistema estudiado. No obstante, la no normalidad de los residuos sugiere que futuros trabajos deberían considerar modelos más robustos (ej. VAR-GARCH o VAR con errores no gaussianos).
+
+
+%----------------------------------------------------------------------------------------
+%   SECTION 6: PRONÓSTICO ROLLING
+%----------------------------------------------------------------------------------------
+
+\section{Pronóstico rolling con SARIMA y VAR}
+
+El pronóstico rolling permite evaluar la capacidad de los modelos para anticipar la evolución de las series en horizontes múltiples, actualizando el ajuste en cada paso con el valor observado. Este enfoque es más exigente que un pronóstico estático, ya que refleja el desempeño del modelo en un escenario de proyección operativa.
+
+\subsection{Resultados con SARIMA}
+
+La figura~\ref{fig:rolling_sarima} muestra el rolling forecast para la serie de Área. Se observa que el modelo sigue la dinámica general, aunque presenta limitaciones en la captura de picos abruptos.
+
+\begin{itemize}
+    \item MSE: 0,0133
+    \item MAE: 0,0794
+    \item RMSE: 0,1151
+    \item MAPE: 43,07\%
+\end{itemize}
+
+Estos valores muestran un error moderado en términos absolutos (RMSE bajo), pero un MAPE elevado debido a la presencia de valores cercanos a cero, donde el porcentaje de error se amplifica.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.35]{Figures/rolling_sarima.png}
+    \caption{Pronóstico rolling con SARIMA para la serie de Área.}
+    \label{fig:rolling_sarima}
+\end{figure}
+
+\subsection{Resultados con VAR}
+
+El modelo VAR fue evaluado para ONI, SOI, MEI y Área, con horizonte rolling de tres rezagos (figura~\ref{fig:rolling_var}).
+
+\begin{itemize}
+    \item MSE: 0,0176
+    \item MAE: 0,0990
+    \item RMSE: 0,1327
+    \item MAPE: 45,58\%
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.30]{Figures/rolling_var.png}
+    \caption{Pronóstico rolling con SARIMA para la serie de Área..}
+    \label{fig:rolling_var}
+\end{figure}
+
+\subsection{Comparación del desempeño en la serie Área}
+La comparación de las métricas de la serie Área entre SARIMA y VAR muestra que ambos métodos alcanzan un desempeño satisfactorio, aunque con diferencias claras. El modelo SARIMA obtiene errores menores en todas las métricas (MSE = 0,0133; RMSE = 0,1151) frente al VAR (MSE = 0,0176; RMSE = 0,1327), lo que indica una mayor precisión en la predicción puntual. Asimismo, el MAE y el MAPE confirman la superioridad de SARIMA, reflejando que en promedio sus estimaciones se ajustan mejor a la magnitud real de la superficie de agua. No obstante, el VAR sigue mostrando un nivel de predicción aceptable, con la ventaja de modelar simultáneamente las interrelaciones con los índices ENSO, lo que lo convierte en una herramienta complementaria para analizar la dinámica conjunta del sistema climático-hidrológico.
+\begin{table}[H]
+    \centering
+    \caption{Comparación de métricas para la serie Área entre SARIMA y VAR}
+    \label{tab:comp_area}
+    \begin{tabular}{lcccc}
+        \toprule
+        Método & MSE & MAE & RMSE & MAPE \\
+        \midrule
+        SARIMA & 0,0133 & 0,0794 & 0,1151 & 43,07\% \\
+        VAR    & 0,0176 & 0,0990 & 0,1327 & 45,58\% \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+
+\subsection{Pronóstico espacio–temporal con CNN (U-Net temporal)}
+
+Con el fin de extender el análisis hacia el futuro, se desarrolló un modelo de redes neuronales convolucionales capaz de predecir la presencia de agua en la laguna a partir de imágenes satelitales mensuales. Para ello se utilizó una variante de la arquitectura U-Net \parencite{ronneberger2015unet}, adaptada para trabajar con secuencias de meses consecutivos en lugar de imágenes aisladas. De esta manera, el modelo aprovecha tanto la información espacial (formas y patrones dentro de cada imagen) como la temporal (cómo evoluciona el agua de un mes a otro).
+
+El procedimiento consiste en entregarle al modelo un bloque de meses previos y pedirle que estime la máscara de agua del mes siguiente. Al repetir este proceso de manera encadenada (lo que se conoce como pronóstico autoregresivo), se obtiene una proyección de la dinámica de la laguna hacia adelante en el tiempo. Las salidas del modelo son tanto mapas de probabilidad de presencia de agua como máscaras binarias (agua/no agua) tras aplicar un umbral.
+
+El entrenamiento se realizó con las series históricas de imágenes ya procesadas y normalizadas. Para evaluar su desempeño, se analizaron las curvas de pérdida en entrenamiento y validación, que mostraron una reducción estable a lo largo de las épocas. En los resultados cualitativos se observa que las predicciones del modelo reproducen coherentemente la forma y extensión de la laguna en distintos meses, mientras que la serie de área pronosticada mantiene la variabilidad temporal observada en los datos reales.
+
+En síntesis, este enfoque basado en aprendizaje profundo permite no sólo reconstruir el pasado de manera automática, sino también generar escenarios futuros de disponibilidad de agua en el salar, lo que constituye un aporte novedoso respecto a los métodos estadísticos utilizados en las secciones anteriores.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.80]{Figures/forecast_cnn1.png}
+    \caption{Pronóstico del área usando CNN (Octubre 2023).}
+    \label{fig:forecast_cnn}
+\end{figure}
+
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.30]{Figures/forecast_cnn.png}
+    \caption{Pronóstico del área usando CNN (12 meses.}
+    \label{fig:forecast_cnn}
+\end{figure}
+
+\subsection{Arquitectura de la U-Net temporal}
+
+La arquitectura implementada corresponde a una variante de U-Net \parencite{ronneberger2015unet}, diseñada originalmente para segmentación de imágenes biomédicas y hoy ampliamente utilizada en visión por computadora. En este trabajo se adaptó la red para integrar información espacio--temporal, de manera que no solo procese la forma y extensión de la laguna en cada mes, sino también la dinámica que muestran las secuencias mensuales previas.
+
+La estructura general sigue un esquema de codificador--decodificador. En la primera parte (codificador), las imágenes de entrada ---una ventana temporal de varios meses consecutivos--- se reducen progresivamente en tamaño espacial mientras aumentan en profundidad, extrayendo representaciones de mayor nivel que capturan texturas, bordes y patrones espaciales. En la segunda parte (decodificador), la red reconstruye la resolución original combinando estas representaciones profundas con las características locales preservadas en las capas iniciales (conexiones tipo \emph{skip}). Esta estrategia permite mantener el detalle espacial de la laguna a la vez que se incorporan las dependencias temporales de la serie.
+
+La salida de la red es un mapa bidimensional de probabilidad de presencia de agua para el mes siguiente. Dicho mapa puede umbralizarse para obtener una máscara binaria agua/no agua, o interpretarse directamente como una probabilidad espacial continua. En este trabajo se empleó una función de pérdida compuesta que combina \emph{binary cross entropy} y \emph{dice loss}, equilibrando la precisión en la clasificación pixel a pixel con la coherencia en la forma segmentada.
+
+En la figura~\ref{fig:curva_unet} se presentan las curvas de pérdida durante el entrenamiento de la U-Net temporal. Se observa un descenso inicial pronunciado en las primeras épocas (1--5), donde la pérdida de entrenamiento disminuye de manera marcada, evidenciando la rápida captura de patrones relevantes. De forma consistente, la pérdida de validación también se reduce, indicando que el modelo logra generalizar a los datos no vistos.
+
+A partir de la época 6, ambas curvas muestran una meseta con pequeñas oscilaciones, estabilizándose en torno a valores de $0.14$ para la validación y $0.087$--$0.089$ para el entrenamiento. La brecha entre ambas es reducida, lo que sugiere que no se presentan problemas significativos de sobreajuste. 
+
+En síntesis, el modelo alcanzó un buen equilibrio entre aprendizaje y generalización, con resultados estables y consistentes. Como trabajo futuro, podrían explorarse ajustes finos (mayor número de épocas, uso de \emph{learning rate schedulers} o variación del \emph{batch size}) para mejorar aún más la estabilidad de la validación.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.50]{Figures/curva_unet.png}
+    \caption{Pronóstico usando CNN.}
+    \label{fig:curva_unet}
+\end{figure}
+
+
+En síntesis, la U-Net temporal permite capturar patrones complejos de variación espacial y temporal, ofreciendo una herramienta flexible para el pronóstico de la cobertura de agua en la laguna del Salar de Llullaillaco.
+
 
 %----------------------------------------------------------------------------------------
 % 4.4 LIMITACIONES Y OBSERVACIONES
@@ -384,13 +476,17 @@ A continuación se detallan las principales limitaciones,  supuestos y riesgo de
     \item Serie Área: la diferenciación mejoró la robustez y redujo el error validando el preprocesamiento.
     \item ENSO: fuerte interdependencia entre ONI, SOI y MEI (Granger), con un rol central del SOI sobre Área. El VAR confirmó persistencia propia de cada índice y efectos cruzados coherentes con la física climática.
     \item SOI: aunque los residuos no presentan autocorrelación relevante, las métricas de error del modelo SARIMA fueron altas respecto de su escala, sugiriendo simplificación y/o modelos alternativos (por ejemplo, con heterocedasticidad).
+    \item Segmentación con U-Net: el etiquetado automático mediante la red permitió generar una serie temporal estable sin necesidad de anotación manual, aunque con limitaciones en la cuantificación de métricas exhaustivas de segmentación.
 \end{itemize}
+
 
 \subsection{Riesgos y mitigaciones}
 \begin{itemize}
     \item Dependencia de GEE y catálogos: fallos de disponibilidad pueden afectar la reproducibilidad. Mitigación: exportaciones imágenes.
     \item Sesgo por agregación espacial: el foco en la laguna central puede omitir dinámicas periféricas. Mitigación: probar la metodologia en otros sectores del salar.
+     \item Complejidad computacional: el entrenamiento de modelos de segmentación y forecasting requiere recursos elevados. Mitigación: escalado progresivo, uso de subconjuntos y validación cruzada.
 \end{itemize}
+
 
 
 %----------------------------------------------------------------------------------------

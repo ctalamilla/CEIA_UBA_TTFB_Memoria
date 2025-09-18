@@ -6,6 +6,15 @@
 
 \begin{figure}[ht]
         \centering
+        \includegraphics[scale=.45]
+        {Figures/fig16_ts_area.png}
+        \caption{Registro histórico de la variable Área (1984-2022).}
+        \label{fig:indice_area}
+\end{figure}
+
+
+\begin{figure}[ht]
+        \centering
         \includegraphics[scale=.38]
         {Figures/fig13_oni.png}
         \caption{Índice ONI (1984-2022).}
@@ -51,13 +60,8 @@
         \caption{Índice MEI (1984-2022).}
         \label{fig:indice_mei_ts}
 \end{figure}
+\newpage
 
-\begin{figure}[htpb]
-    \centering
-    \includegraphics[scale=.40]{Figures/conteo_series.png}
-    \caption{Cantidad de meses con datos disponibles por año y variable (ONI, SOI, MEI, Área).}
-    \label{fig:conteo_datos}
-\end{figure}
 
 \begin{figure}[H]
     \centering
@@ -164,6 +168,13 @@
 \label{fig:inco_area}
 \end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=.42]{Figures/facp_Area_dif.png}
+    \caption{Funciones ACF y PACF de la serie Área (superficie de agua).}
+    \label{fig:facp_area_dif}
+\end{figure}
+
 \begin{figure}[H]\centering
 \includegraphics[scale=.52]{Figures/acf_pacf_res_area_d.png}
 \caption{Área (diferenciada): ACF y PACF de los residuos.}
@@ -180,4 +191,77 @@
 \includegraphics[scale=.52]{Figures/inco_area_d.png}
 \caption{Área (diferenciada): gráfico de incorrelación (p--valores Ljung--Box por lag).}
 \label{fig:inco_area_d}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[scale=.30]{Figures/res_sarima_oni.png}
+\caption{ONI: residuos del modelo SARIMA.}
+\label{fig:res_oni}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[scale=.42]{Figures/pred_oni.png}
+\caption{ONI: observado (train+test) vs. predicciones con IC 95\%.}
+\label{fig:pred_oni}
+\end{figure}
+
+
+
+\begin{figure}[H]\centering
+\includegraphics[scale=.30]{Figures/res_sarima_soi.png}
+\caption{SOI: residuos del modelo SARIMA.}
+\label{fig:res_soi}
+\end{figure}
+
+
+\begin{figure}[H]\centering
+\includegraphics[scale=.42]{Figures/pred_soi.png}
+\caption{SOI: observado (train+test) vs. predicciones con IC 95\%.}
+\label{fig:pred_soi}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[scale=.30]{Figures/res_sarima_mei.png}
+\caption{MEI: residuos del modelo SARIMA.}
+\label{fig:res_mei}
+\end{figure}
+
+
+\begin{figure}[H]\centering
+\includegraphics[scale=.42]{Figures/pred_mei.png}
+\caption{MEI: observado (train+test) vs. predicciones con IC 95\%.}
+\label{fig:pred_mei}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[scale=.30]{Figures/res_sarima_area.png}
+\caption{Área: residuos del modelo SARIMA.}
+\label{fig:res_area}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[scale=.42]{Figures/pred_area.png}
+\caption{Área: observado (train+test) vs. predicciones con IC 95\%.}
+\label{fig:pred_area}
+\end{figure}
+
+
+\begin{figure}[H]\centering
+\includegraphics[scale=.30]{Figures/res_sarima_area_d.png}
+\caption{Área (diferenciada): residuos del modelo SARIMA.}
+\label{fig:res_area_d}
+\end{figure}
+
+
+\begin{figure}[H]\centering
+\includegraphics[scale=.42]{Figures/pred_area_d.png}
+\caption{Área (diferenciada): observado (train+test) vs. predicciones con IC 95\%.}
+\label{fig:pred_area_d}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.32]{Figures/var_pred.png}
+    \caption{Predicciones del modelo VAR(3) frente a los valores reales de ONI, SOI, MEI y Área.}
+    \label{fig:var_pred}
 \end{figure}

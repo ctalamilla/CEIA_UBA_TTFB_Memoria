@@ -39,12 +39,12 @@ A continuación, se detallan los principales requerimientos funcionales y técni
 
 El desarrollo de este trabajo se basa en la combinación de técnicas de teledetección, análisis multitemporal y aprendizaje automático, integradas en un flujo de trabajo que permite monitorear la presencia de agua superficial en el Salar de Llullaillaco y explorar su relación con la variabilidad climática regional.
 
-\subsection*{Google Earth Engine (GEE)}
+\subsection{Google Earth Engine (GEE)}
 
 Se utilizó la plataforma GEE para el acceso y procesamiento de imágenes Landsat 5, 7 y 8, con el mismo enfoque usado por \cite{ferran2024ceia, roldan2023ceia}. GEE permite aplicar filtros temporales, máscaras de nubes, recortes espaciales y cálculos de índices espectrales sobre áreas definidas, con eficiencia y escalabilidad.
 
 
-\subsection*{Sobre los índices espectrales}
+\subsection{Sobre los índices espectrales}
 
 El índice espectral utilizado en este trabajo fue el NDWI (\textit{Normalized Difference Water Index}). Este índice se basa en relaciones matemáticas entre bandas del espectro electromagnético que capturan variaciones en la reflectancia del terreno. Estas métricas se fundamentan en estudios de respuesta espectral diferencial de distintos tipos de cobertura superficial, como agua, vegetación o nieve, especialmente visibles en las bandas verde, roja, infrarroja cercana (NIR) y de onda corta (SWIR).
 
@@ -54,7 +54,7 @@ Tal como se observa en trabajos clásicos de teledetección \cite{tucker1979red,
 En este trabajo se usó principalmente NDWI como un marco conceptual útil para entender las diferencias espectrales de las cubiertas superficiales analizadas en el Salar de Llullaillaco.
 
 
-\subsection*{Índice espectral utilizado}
+\subsection{Índice espectral utilizado}
 
 El indice NDWI permite caracterizar el comportamiento espectral del suelo y del agua en ambientes de alta reflectancia como los salares. En la figura ~\ref{fig:curva_ref} se puede observar las reflectancias espectrales de suelo seco, suelo húmedo y vegetación completamente verde. 
 
@@ -71,12 +71,12 @@ El NDWI resalta la presencia de agua superficial ya que emplea las bandas del ve
 	\includegraphics[scale=.5]{Figures/fig3.png}
 	\caption{Reflectancias espectrales de suelo seco, suelo húmedo y vegetación completamente verde\protect\footnotemark.}
 	\label{fig:curva_ref}
-\end{figure}
-
+\end{figure}  
+\newpage
 \footnotetext{Imagen tomada de \cite{tucker1979red}.}}
 
 
-\subsection*{Imágenes Landsat utilizadas}
+\subsection{Imágenes Landsat utilizadas}
 
 Para este trabajo se emplearon imágenes ópticas de las misiones \Landsat 5 TM, Landsat 7 ETM+ y Landsat 8 OLI, disponibles en la plataforma GEE como colecciones. Las colecciones empleadas de Google Earth Engine fueron:
 
@@ -118,6 +118,53 @@ Las bandas empleadas en los cálculos de índices espectrales fueron:
 
 
 Estas bandas fueron utilizadas para calcular el índice NDWI. Se ajustaron sus combinaciones según el sensor. La consistencia intersensorial fue manejada a través de normalización espectral mensual y máscaras de calidad provistas por GEE.
+
+
+\subsection{U-Net y su aplicación en la clasificación de cuerpos de agua}
+
+La \textit{U-Net} es una arquitectura de redes neuronales convolucionales diseñada para
+segmentación semántica de imágenes. Su estructura en forma de ``U'' combina un
+proceso de codificación, que extrae características de alto nivel reduciendo la
+resolución espacial, con un proceso de decodificación que reconstruye la
+segmentación a la resolución original. Los \textit{skip connections} permiten
+recuperar detalles finos en los bordes, logrando una clasificación más precisa.
+
+En el caso de cuerpos de agua, la U-Net presenta ventajas frente a métodos
+puramente espectrales como el NDWI. Permite diferenciar con mayor exactitud
+zonas de agua en ambientes heterogéneos, reduciendo falsos positivos asociados
+a sombras o suelos húmedos. Trabajos recientes, como \textit{DeepAqua}\cite{DeepAqua2023},
+utilizan el NDWI como \textit{teacher} para generar etiquetas binarias y entrenar
+una U-Net como \textit{student}, demostrando que incluso con etiquetas automáticas
+se obtiene una segmentación robusta y generalizable en imágenes Landsat y Sentinel.
+
+
+\subsection{Conocimiento distilado para segmentación de agua}
+
+El esquema de \textit{knowledge distillation} (KD) aplicado a cartografía de agua consiste en entrenar un \textit{student} de segmentación profunda a partir de etiquetas proxy generadas automáticamente por un \textit{teacher}. 
+
+En la línea de \emph{DeepAqua} \cite{DeepAqua2023}, el \textit{teacher} se construye en el dominio óptico mediante el índice NDWI y el \textit{student} es una red neuronal profunda de tipo U-Net que aprende a reproducir dichas máscaras, evitando anotación manual.
+
+El NDWI \textit{teacher} y se umbraliza para obtener una máscara binaria. Opcionalmente se aplican operaciones morfológicas ligeras para eliminar ruido. 
+
+En este trabajo el teacher se genera con imágenes Landsat con control de nubosidad y sincronización temporal mensual como se explico anteriormente.
+
+Para sección \textit{Student} (U-Net) empleamos una U-Net 2D estándar con \emph{skip connections}. La entrada es una imagen multicanal y la salida es una binaria de agua/no-agua. 
+
+En el trabajo \cite{DeepAqua2023} la entrada es SAR (C-band) y el modelo aprende a partir del teacher óptico (mascara binaria a partir de NDWI). En nuestra adaptación usamos bandas ópticas Landsat (SR5--SR4--SR3) como entrada, manteniendo la misma función objetivo y protocolo de entrenamiento. Esta variante conserva las ventajas de KD (eliminar rotulado manual) y simplifica la disponibilidad operativa de disponibilidad de imagenes SAR.
+
+% --- Figura (opcional) ---
+\begin{figure}[t]
+  \centering
+  \includegraphics[scale=0.7]{Figures/KD_deepaqua.jpg}
+  \caption{Esquema de distillation para segmentación de agua. Arriba: enfoque tradicional con anotación manual. Abajo: enfoque teacher - student con U-Net. \protect\footnotemark.}
+  \label{fig:kd-water}
+\end{figure}
+
+\footnotetext{Imagen tomada de \cite{DeepAqua2023}.}
+
+De esta manera el KD reduce la dependencia de rótulos manuales, mejora la robustez ante variabilidad espectral y permite operación \emph{near real-time}. En \cite{DeepAqua2023} se reportan mejoras en IoU/F1 frente a métodos puramente no supervisados y capacidad para capturar agua abierta y vegetada; en nuestra adaptación óptica, el comportamiento esperado es comparable en escenas despejadas, con el costo de una mayor sensibilidad a nubosidad (mitigado vía filtrado y composición mensual).
+
+
 
 \subsection*{Variables climáticas ENSO}
 
@@ -176,6 +223,11 @@ Las siguientes bibliotecas fueron utilizadas en distintas etapas del flujo de tr
     \item \texttt{PYTHON}: lenguaje principal utilizado para análisis de datos, entrenamiento de modelos, generación de gráficos y administración de workflows. Versión 3.10.
     \item \texttt{Google Eart Engine}: plataforma web de procesamiento satelital utilizada para acceder, filtrar y procesar imágenes Landsat, y calcular índices espectrales. API JS (Web) y API Python versión 0.1.365.
     \item \texttt{Google Colab}: entorno de ejecución en la nube usado para integración con GEE y entrenamiento de modelos. Versión utilizada: mayo 2025.
+    \item \texttt{xarray}: manejo de cubos n–dimensionales (\textit{Dataset}/\textit{DataArray}), resampleo temporal y álgebra raster.
+    \item \texttt{rioxarray}: gestión de CRS, reproyección, recorte espacial y cálculo en unidades métricas (e.g., EPSG:22173).
+    \item \texttt{xee} (\emph{xarray–Earth Engine}): integración directa GEE~$\leftrightarrow$~xarray (por ejemplo, \texttt{engine='ee'} en \texttt{xarray.open\_dataset}), preservando \texttt{crs} y \texttt{scale}.
+    \item \texttt{geemap}: visualización interactiva de capas GEE en notebooks, dibujo de ROI y exportación/inspección de colecciones.
+    \item \texttt{Google Earth Engine API (Python)}: cliente para consulta y procesamiento remoto de colecciones.
 \end{itemize}
 
 

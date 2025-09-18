@@ -10,19 +10,24 @@ Este capítulo presenta las conclusiones generales del trabajo, resumiendo los a
 %----------------------------------------------------------------------------------------
 
 \section{Conclusiones generales }
+El trabajo permitió caracterizar la dinámica temporal de la superficie de agua en el Salar de Llullaillaco y su relación con los principales índices climáticos asociados al ENSO. A partir de la construcción de un cubo temporal mensual continuo y de la aplicación de metodologías estadísticas y de aprendizaje profundo, se alcanzaron hallazgos relevantes sobre la influencia climática regional en la hidrología altoandina. 
 
-El trabajo realizado permitió analizar la dinámica temporal de la superficie de agua en el Salar de Llullaillaco y su relación con los principales índices climáticos del fenómeno ENSO (ONI, SOI y MEI). A partir de la planificación inicial y las pruebas desarrolladas, se alcanzaron los siguientes logros y hallazgos principales:
+Entre los principales resultados se destaca que el SOI emergió como el índice con mayor capacidad explicativa sobre la superficie de agua, confirmado por los modelos VAR y la prueba de causalidad de Granger. La integración de SARIMA y VAR permitió capturar la estacionalidad y las interdependencias multivariadas, mientras que la segmentación automática con U-Net facilitó la generación de series homogéneas sin necesidad de etiquetado manual. En síntesis, se validó la hipótesis de que la variabilidad climática global, en particular el ENSO, constituye un factor determinante en la dinámica hídrica del salar.
+
+
+A partir de la planificación inicial y las pruebas desarrolladas, se alcanzaron los siguientes logros y hallazgos principales:
 
 \begin{itemize}
-    \item Se construyó una serie temporal mensual continua de la superficie de agua (1984--2022), aplicando un enfoque híbrido de interpolación y promedios estacionales para cubrir vacíos, lo que garantizó la homogeneidad requerida para el modelado.
-    \item Se comprobó que las series climáticas ONI, SOI y MEI son estacionarias, mientras que el Área requirió diferenciación. Esta etapa de preprocesamiento fue clave para asegurar la robustez de los modelos posteriores.
-    \item Los modelos SARIMA mostraron buen desempeño predictivo en general, destacándose el ajuste sobre la serie diferenciada (\emph{Área\_diff}) con errores mínimos y residuos consistentes con ruido blanco. El caso del SOI presentó mayores dificultades, reflejando su alta variabilidad.
-    \item El modelo VAR(3) permitió capturar interdependencias multivariadas. Se confirmó la fuerte relación entre ONI, SOI y MEI, mientras que el SOI emergió como variable clave al mostrar causalidad directa sobre el Área.
-    \item La prueba de causalidad de Granger evidenció relaciones significativas entre los índices ENSO y, en particular, que el SOI es el único con influencia estadísticamente significativa sobre la superficie de agua.
-    \item El análisis de respuesta al impulso mostró que perturbaciones en SOI afectan tanto a los índices oceánicos como al Área, reforzando su rol como modulador atmosférico de la hidrología altoandina.
-    \item Se cumplió la mayoría de los requisitos planteados en la planificación: descarga y procesamiento de imágenes satelitales, construcción de series homogéneas, modelado SARIMA/VAR, validación de resultados y visualización de mapas y gráficos. Permanecieron en progreso la formalización de métricas de precisión categórica y las pruebas cruzadas con imágenes Sentinel-2.
-    \item Los riesgos identificados inicialmente (como la falta de datos satelitales o errores en índices) no se materializaron de manera crítica, y las medidas de mitigación fueron efectivas. El mayor desafío se concentró en la alta variabilidad de las series ENSO y en la necesidad de preprocesamiento riguroso.
+    \item Se construyó un cubo temporal mensual continuo de la superficie de agua (1984--2022), combinando interpolación e imputación estacional para cubrir vacíos y asegurar homogeneidad en la serie.
+    \item La segmentación con U-Net, entrenada mediante el esquema \emph{knowledge distillation}, permitió generar máscaras mensuales de agua de manera automática, evitando la necesidad de etiquetado manual y aportando consistencia espacial y temporal.
+    \item A partir de estas máscaras se derivó la serie de Área, que mostró estacionariedad solo tras diferenciación, mientras que las series climáticas ONI, SOI y MEI fueron estacionarias desde el inicio.
+    \item Los modelos SARIMA mostraron buen ajuste, destacándose la serie diferenciada de Área con residuos consistentes con ruido blanco; el SOI resultó más complejo de modelar por su alta variabilidad.
+    \item El modelo VAR(3) capturó interdependencias multivariadas entre ONI, SOI y MEI, confirmando la influencia significativa del SOI sobre el Área, resultado reforzado por la prueba de causalidad de Granger y las respuestas al impulso.
+    \item Se realizaron pronósticos mediante \emph{rolling forecast} con SARIMA y VAR, validando la capacidad predictiva de ambas metodologías y evidenciando limitaciones en la captura de picos extremos.
+    \item Se cumplió la mayoría de los requisitos planteados en la planificación: construcción de series homogéneas, modelado SARIMA/VAR, segmentación automática con U-Net, validación de resultados y visualización. Permanecen en progreso las métricas de precisión categórica y las pruebas cruzadas con Sentinel-2.
+    \item Los riesgos identificados (brechas satelitales, errores en índices) no se materializaron de manera crítica; las medidas de mitigación fueron efectivas, aunque la alta variabilidad del SOI y la necesidad de preprocesamiento riguroso se mantuvieron como los principales desafíos.
 \end{itemize}
+
 
 En síntesis, el trabajo permitió validar la hipótesis inicial: la variabilidad climática global asociada al ENSO, en especial la expresada por el SOI, constituye un factor determinante en la dinámica hídrica del Salar de Llullaillaco.
 
@@ -32,14 +37,6 @@ En síntesis, el trabajo permitió validar la hipótesis inicial: la variabilida
 
 \section{Próximos pasos}
 
-El proyecto abre la posibilidad de ampliar y profundizar el análisis en varias direcciones:
+El trabajo abre la posibilidad de ampliar la metodología hacia nuevas aplicaciones y mejoras técnicas. Entre ellas, la extensión a otros salares de la Puna y el altiplano para evaluar la consistencia regional, la incorporación de sensores adicionales como Sentinel-2, y la exploración de modelos de inteligencia artificial avanzados (LSTM, transformers) capaces de capturar relaciones no lineales y patrones complejos. 
 
-\begin{itemize}
-    \item Extender la metodología a otros salares de la Puna argentina y del altiplano sudamericano, para evaluar la consistencia regional de los hallazgos.
-    \item Incorporar nuevos sensores satelitales (p.ej., Sentinel-2 o MODIS) que aporten mayor resolución temporal y espectral, permitiendo mejorar la detección de cuerpos de agua de menor tamaño.
-    \item Explorar el uso de técnicas de inteligencia artificial avanzadas, como redes neuronales recurrentes (LSTM, GRU) o arquitecturas basadas en \textit{transformers}, para capturar dependencias no lineales y patrones complejos en las series temporales.
-    \item Profundizar el análisis de incertidumbre, integrando modelos VAR con errores heterocedásticos (VAR-GARCH) o distribuciones no gaussianas para mejorar la representación de colas pesadas y eventos extremos.
-    \item Evaluar la integración de variables hidrometeorológicas locales (precipitación, temperatura, evapotranspiración) cuando estén disponibles, con el fin de enriquecer los modelos predictivos y la comprensión de los procesos.
-\end{itemize}
-
-En conjunto, estos pasos permitirán robustecer la base metodológica desarrollada y avanzar hacia herramientas predictivas operativas que apoyen la gestión ambiental y la toma de decisiones en ecosistemas sensibles de altura.
+Asimismo, resulta prioritario profundizar el análisis de incertidumbre mediante modelos que contemplen heterocedasticidad y distribuciones no gaussianas, e integrar variables hidrometeorológicas locales (precipitación, temperatura, evapotranspiración) que complementen los indicadores climáticos globales. Estos pasos permitirán consolidar la base metodológica y avanzar hacia sistemas predictivos robustos que respalden la gestión ambiental en ecosistemas de altura.
