@@ -48,7 +48,7 @@ Este capítulo presenta la solución desarrollada para abordar el análisis mult
 
 \section{Área de estudio y representación espacial}
 
-La cuenca hidrográfica del  Salar de Llullaillaco incluye sectores volcánicos elevados y drenajes que desembocan sobre el salar lo que genera condiciones potenciales para la ocurrencia de cuerpos de agua temporales. Esta delimitación hidrológica se muestra en la figura~\ref{fig:cuenca_llullaillaco}.
+La cuenca hidrográfica del  Salar de Llullaillaco incluye sectores volcánicos elevados y drenajes que desembocan sobre el salar, lo que genera condiciones potenciales para la ocurrencia de cuerpos de agua temporales. Esta delimitación hidrológica se muestra en la figura~\ref{fig:cuenca_llullaillaco}.
 
 
 \begin{figure}[htpb]
@@ -81,12 +81,12 @@ Dado que cada misión Landsat posee distinto patrón de cobertura espacial y que
 
 Se observa que la zona con mayor recurrencia de agua corresponde a la laguna central del salar, un cuerpo de agua de morfología alargada, ubicado en el eje norte-sur de la depresión principal. Por este motivo, el análisis estadístico y la posterior implementación de modelos predictivos se enfocan principalmente en esa área. Desde el punto de vista de la biodiversidad esta laguna es la que presenta mayor concentración de fauna acuática.
 
-La figura~\ref{fig:epoca_seca_hum}  permiten visualizar el cambio estacional en la extensión de la laguna central del Salar de Llullaillaco y muestran diferencias notables entre los meses secos y húmedos.
+Las imágenes de la figura~\ref{fig:epoca_seca_hum} permiten visualizar el cambio estacional en la extensión de la laguna central del Salar de Llullaillaco y muestran diferencias notables entre los meses secos y húmedos.
 
 
 \begin{figure}[ht]
         \centering
-        \includegraphics[scale=.37]
+        \includegraphics[scale=.34]
         {Figures/rbg_cap3_a.png}
         \caption{Imagen en composición RGB 543. Izquierda: época seca (enero 2015). Derecha: época húmeda (agosto 2021).}
         \label{fig:epoca_seca_hum}
@@ -98,9 +98,9 @@ La figura~\ref{fig:ndwi_seco_hum} muestra el índice NDWI para dos fechas repres
 
 \begin{figure}[ht]
         \centering
-        \includegraphics[scale=.37]
+        \includegraphics[scale=.33]
         {Figures/rgb_cap3_b.png}
-        \caption{Indice NDWI. Izquierda: época seca (enero 2015). Derecha: época húmeda (agosto 2021).}
+        \caption{Índice NDWI. Izquierda: época seca (enero 2015). Derecha: época húmeda (agosto 2021).}
         \label{fig:ndwi_seco_hum}
 \end{figure}
 
@@ -110,42 +110,41 @@ La figura~\ref{fig:ndwi_seco_hum} muestra el índice NDWI para dos fechas repres
 
 El sistema propuesto se basa en una arquitectura modular que integra tecnologías de teledetección, análisis de datos climáticos y modelado basado en inteligencia artificial. Esta integración permite automatizar el proceso de detección de agua superficial en el Salar de Llullaillaco y explorar su posible relación con variables climáticas globales como las asociadas al fenómeno ENSO.
 
-\subsection*{Componentes principales}
+\subsection{Componentes principales}
 
-La arquitectura general del sistema se compone de tres bloques funcionales principales (ver figura \ref{fig:arquitectura_general}):
-
-\subsection*{Componentes principales}
-
-La arquitectura general del sistema se compone de cuatro bloques funcionales principales (ver figura \ref{fig:arquitectura_general}):
+La arquitectura general del sistema se compone de cuatro bloques funcionales principales (ver figura \ref{fig:arquitectura_general2}):
 
 \begin{enumerate}
     \item Bloque de adquisición y preprocesamiento: se encarga de la descarga, filtrado y procesamiento de imágenes satelitales Landsat desde la plataforma GEE. En esta etapa se recorta el área de interés, se eliminan imágenes con cobertura nubosa o mala calidad y se construye un cubo temporal mensual de reflectancias. Los vacíos se completan mediante imputación, garantizando series continuas.
 
-    \item Bloque de segmentación automática: sobre el cubo mensual se aplicó un modelo de segmentación U-Net \citep{ronneberger2015unet}, entrenado con el esquema \textit{student–teacher} \citep{hinton2015distilling}. Para ello se seleccionó un subconjunto de imágenes, se calculó NDWI y se binarizó con un umbral de 0.15, generando las etiquetas de entrenamiento. De este modo se evitó el etiquetado manual y se logró clasificar agua/no-agua en todas las imágenes mensuales.
+    \item Bloque de segmentación automática: sobre el cubo mensual se aplicó un modelo de segmentación U-Net \citep{ronneberger2015unet}, entrenado con el esquema \textit{student–teacher} \citep{hinton2015distilling}. Para ello se seleccionó un subconjunto de imágenes, se calculó NDWI y se binarizó con un umbral de 0.15, generando las etiquetas de entrenamiento. De este modo se evitó el etiquetado manual y se logró clasificar agua/no-agua en todas las imágenes mensuales. Ver figura \ref{fig:arquitectura_general}.
 
     \item Bloque de integración climática: incorpora las series mensuales de los indicadores ENSO (Niño 3.4, SOI y MEI), obtenidas de fuentes oficiales (NOAA, BOM, PSL), alineadas temporalmente con las series de agua derivadas de las imágenes.
 
     \item Bloque de análisis y modelado: a partir de las series continuas de agua y ENSO se realizaron pruebas de estacionariedad (ADF, KPSS, PP), funciones de autocorrelación (ACF, PACF) y el ajuste de modelos SARIMA y VAR. Se evaluó su capacidad predictiva mediante métricas de error (RMSE, MAE) y se analizaron interdependencias estadísticas. La implementación y validación se realizó en Google Colab con Python, garantizando replicabilidad y visualización de resultados.
 \end{enumerate}
 
+\newpage
 
-\begin{sidewaysfigure}
-	\centering
-	\includegraphics[scale=.4]{Figures/Arqui_TTFB22.png}
-	\caption{Arquitectura general de la clasificación y generación de la serie de tiempo.}
-	\label{fig:arquitectura_general}
-\end{sidewaysfigure}
 
 \begin{figure}[htpb] 
     \centering 
     \includegraphics[scale=.4]{Figures/Arqui_TTFB3.png} 
     \caption{Arquitectura general del sistema: desde la adquisición hasta el modelado.} 
-    \label{fig:arquitectura_general} 
+    \label{fig:arquitectura_general2} 
 \end{figure}
 
-\subsection*{Flujo de trabajo detallado}
+\begin{figure}
+	\centering
+	\includegraphics[scale=.6]{Figures/Arqui_TTFBv3.png}
+	\caption{Arquitectura general de la clasificación y generación de la serie de tiempo.}
+	\label{fig:arquitectura_general}
+\end{figure}
 
-El flujo de trabajo completo incluye las siguientes etapas:
+\newpage
+\subsection{Flujo de trabajo detallado}
+
+El flujo de trabajo completo incluyó las siguientes etapas:
 
 \begin{enumerate}
     \item Extracción satelital: se utilizaron las colecciones Landsat 5, Landsat 7 y Landsat 8 en GEE. Se seleccionaron imágenes con menos del 20\% de nubosidad y se recortaron al polígono del salar.
@@ -162,7 +161,7 @@ El flujo de trabajo completo incluye las siguientes etapas:
 \end{enumerate}
 
 
-\subsection*{Ventajas de la arquitectura}
+\subsection{Ventajas de la arquitectura}
 
 Esta arquitectura ofrece múltiples beneficios:
 
@@ -175,20 +174,18 @@ Esta arquitectura ofrece múltiples beneficios:
 
 Esta solución integrada proporciona una herramienta robusta para el análisis ambiental en zonas remotas como la Puna. Su estructura modular, su compatibilidad con datos abiertos y su orientación hacia el análisis multitemporal y predictivo la convierten en una alternativa metodológica replicable en estudios de monitoreo hídrico, cambio climático y gestión territorial.
 
-
 \section{Preprocesamiento de imágenes}
 
 El preprocesamiento de imágenes satelitales constituye una etapa crítica en todo análisis multitemporal con sensores remotos. En este estudio, se utilizaron imágenes ópticas provenientes de las misiones Landsat 5 TM, Landsat 7 ETM+ y Landsat 8 OLI, accedidas desde la plataforma Google Earth Engine, que permite el procesamiento en la nube con acceso a colecciones históricas de datos corregidos radiométrica y atmosféricamente.
 
 El objetivo del preprocesamiento fue generar series temporales limpias y comparables en el tiempo, con el fin de maximizar la calidad de los datos utilizados que son fundamentales para la detección de cuerpos de agua y vegetación residual. 
 
-\subsubsection*{Selección y filtrado de imágenes}
+\subsection{Selección y filtrado de imágenes}
 
 Las colecciones seleccionadas corresponden a los productos nivel 2 (\texttt{L2}), que contienen valores de reflectancia de superficie corregidos atmosféricamente. Los identificadores de las colecciones utilizadas fueron:
 
 \begin{itemize}
     \item \texttt{LANDSAT/LT05/C02/T1\_L2} para Landsat 5.
-    \item \texttt{LANDSAT/LE07/C02/T1\_L2} para Landsat 7.
     \item \texttt{LANDSAT/LC08/C02/T1\_L2} para Landsat 8.
 \end{itemize}
 
@@ -196,20 +193,20 @@ El filtrado incluyó:
 \begin{itemize}
     \item Eliminación de imágenes con cobertura nubosa mayor al 20\% en la región de interés.
     \item Aplicación de máscaras QA (\textit{Quality Assessment}) para excluir píxeles cubiertos por nubes, sombras y nieve.
-    \item Restricción temporal entre 1990 y 2023 y priorización de los meses húmedos (enero–abril) para asegurar observaciones relevantes.
+    \item Restricción temporal entre 1984 y 2022 y priorización de los meses húmedos (enero–abril) para asegurar observaciones relevantes.
 \end{itemize}
 
 Este filtrado permitió construir una base de imágenes consistente y sin anomalías atmosféricas notorias, adecuada para los siguientes pasos del análisis.
 
 
 
-\subsubsection*{Corrección espectral intersensor}
+\subsection{Corrección espectral intersensor}
 
 Debido a diferencias en las respuestas espectrales entre las misiones (especialmente entre TM/ETM+ y OLI), se aplicó una normalización espectral basada en técnicas de remapeo lineal, tal como se propone en la literatura para combinar series temporales Landsat \parencite{roy2016characterization, roy2014landsat8}. Esto garantiza que las diferencias observadas en el índice NDWI no respondan a variaciones instrumentales sino a cambios reales en superficie.
 
-\subsubsection*{Cálculo de índices espectrales}
+\subsection{Cálculo de índices espectrales}
 
-Una vez preprocesadas las imágenes, se calcularon los índices espectrales mensuales para cada misión mediante el uso de las bandas adecuadas. Las bandas utilizadas para cada misión se explicaron en el capitulo anterior.
+Una vez preprocesadas las imágenes, se calcularon los índices espectrales mensuales para cada misión mediante el uso de las bandas adecuadas. Las bandas utilizadas para cada misión se explicaron en el capítulo anterior.
 
 Los valores resultantes fueron exportados como series mensuales promedio para todo el salar, así como también como mapas raster por mes. Esto permitió visualizar la evolución temporal y espacial de la ocurrencia de agua superficial.
 
@@ -217,18 +214,10 @@ Los valores resultantes fueron exportados como series mensuales promedio para to
 
 Esta sección presenta el tratamiento realizado sobre los datos satelitales y climáticos utilizados en el proyecto. Se detallan los criterios de selección, filtrado y preprocesamiento aplicados en la plataforma GEE, así como la integración posterior de variables climáticas globales.
 
-\subsection*{Imágenes satelitales y período de análisis}
+\subsection{Imágenes satelitales y período de análisis}
 
-Se utilizaron imágenes de las misiones Landsat 5 TM, Landsat 7 ETM+ y Landsat 8 OLI, todas en su versión de corrección atmosférica de superficie (Level 2) disponible en GEE.
+Se emplearon imágenes de las misiones Landsat 5 TM y Landsat 8 OLI (productos de nivel 2 en Google Earth Engine), restringidas al polígono del Salar de Llullaillaco, con cobertura nubosa menor al 20\% y enmascaradas para remover nubes y sombras. Landsat 5 fue la fuente principal de datos entre 1985 y 2011, mientras que Landsat 8 se utilizó para el período 2013–2024. La misión Landsat 7 ETM+ se descartó en gran medida debido a la falla del \textit{Scan Line Corrector} ocurrida en 2003, que afectó la calidad geométrica de sus imágenes.
 
-Para la construcción de la serie temporal se consultó las colecciones en la plataforma Google Earth Engine, correspondiente a productos de nivel 2 de Landsat 8. La selección de imágenes se restringió al polígono del Salar de Llullaillaco, al período comprendido entre 2015 y 2022, y a escenas con una cobertura nubosa menor al 20\%. Adicionalmente, se aplicó un enmascaramiento de calidad para remover nubes y sombras, con el fin de asegurar que los valores espectrales utilizados reflejaran las condiciones reales de superficie.
-
-
-Si bien la misión Landsat 7 ETM+ estuvo operativa entre 1999 y 2021, su uso en este proyecto fue limitado debido a restricciones de calidad impuestas por el \textit{Scan Line Corrector (SLC)}. Este componente falló en mayo de 2003 desde donde se generaron pérdidas sistemáticas de cobertura espacial en las imágenes posteriores. Aunque en GEE existen funciones para rellenar o enmascarar los bordes afectados, se priorizó evitar la inclusión de imágenes con geometría incompleta o necesidad de interpolación espacial forzada.
-
-La misión Landsat 5 TM fue seleccionada como fuente principal de imágenes anteriores al año 2011, ya que proporcionó datos continuos entre los años 2000 y 2011 sin fallas estructurales. Su cobertura en la región fue consistente durante la ventana húmeda seleccionada (enero a abril), con una densidad de imágenes suficiente para construir una serie temporal representativa.
-
-Por otro lado, Landsat 8 OLI fue utilizado como principal fuente para el período comprendido entre los años 2013 y 2024. 
 
 En la figura ~\ref{fig:cob_temporal} y en la tabla ~\ref{tab:periodos_landsat} se muestran los períodos de tiempo usados. Es necesario mencionar que debido a la superposición entre Landsat 5 TM y Landsat 7 ETM+ se decidió trabajar solo con Landsat 5 TM y Landsat 8 OLI. Se generó una brecha sin imágenes de 12 meses entre febrero de 2012 y febrero de 2013.
 
@@ -259,16 +248,12 @@ En resumen, la elección de misiones respondió a un compromiso entre calidad ge
 	\label{tab:periodos_landsat}
 \end{table}
 
-\begin{figure}[ht]
-        \centering
-        \includegraphics[scale=.4]
-        {Figures/fig12.png}
-        \caption{Cantidad de imágenes por mes y misión.}
-        \label{fig:cant_imagenes}
-\end{figure}
-
 \subsection{Construcción del cubo temporal (xarray) desde GEE}
-A partir de las consultas en Google Earth Engine (GEE), las colecciones Landsat fueron descargadas y organizadas localmente en un \emph{cubo de datos} espacio–temporal mediante \texttt{xarray}. Este cubo preserva la indexación temporal (fecha) y espacial (filas/columnas) y permite operaciones vectorizadas para apilado, reproyección y enmascaramiento de calidad. A continuación se presenta un ejemplo de 4 imágenes dentro del cubo de datos~\ref{fig:agg_mens}.
+A partir de las consultas en Google Earth Engine (GEE), las colecciones Landsat fueron descargadas y organizadas localmente en un \emph{cubo de datos} espacio–temporal mediante \texttt{xarray}. Este cubo preserva la indexación temporal (fecha) y espacial (filas/columnas) y permite operaciones vectorizadas para apilado, reproyección y enmascaramiento de calidad. En la figura~\ref{fig:agg_mens} se presenta un ejemplo de 4 imágenes dentro del cubo de datos y en la figura~\ref{fig:img_mens_agg} se presenta un ejemplo de cómo trabaja el cubo de datos en las agregaciones temporales.
+
+\subsection{Agregación mensual e imputación de meses faltantes}
+El cubo diario de imagen inicial fue agregado a escala \emph{mensual} (mediana de reflectancia) para homogeneizar la frecuencia de análisis. Dado que algunos meses carecían de imágenes válidas (ver figura~\ref{fig:conteo_datos}), se generó un cubo mensual \emph{imputado} aplicando la estrategia de promedio mensual histórico para imágenes mensuales ausentes. El resultado es un cubo mensual continuo que sostiene las etapas posteriores de segmentación y series temporales. En el apéndice \ref{AppendixA} se presentan las imágenes mensuales (mediana) dentro del cubo de datos~\ref{fig:img_mens}.
+
 
 \begin{figure}[ht]
         \centering
@@ -278,49 +263,33 @@ A partir de las consultas en Google Earth Engine (GEE), las colecciones Landsat 
         \label{fig:agg_mens}
 \end{figure}
 
-\begin{figure}[htpb]
-    \centering
-    \includegraphics[scale=.40]{Figures/conteo_series.png}
-    \caption{Cantidad de meses con datos disponibles por año y variable (ONI, SOI, MEI, Área).}
-    \label{fig:conteo_datos}
-\end{figure}
-
-\subsection{Agregación mensual e imputación de meses faltantes}
-El cubo diario de imagen inicial fue agregado a escala \emph{mensual} (mediana de reflectancia) para homogeneizar la frecuencia de análisis. Dado que algunos meses carecían de imágenes válidas(ver figura~\ref{fig:conteo_datos}, se generó un cubo mensual \emph{imputado} aplicando la estrategia de promedio mensual histórico para imágenes mensuales ausentes. El resultado es un cubo mensual continuo que sostiene las etapas posteriores de segmentación y series temporales. A continuación se presenta las imágenes mensuales (mediana) dentro del cubo de datos~\ref{fig:agg_mens}.
-
 \begin{figure}[ht]
         \centering
         \includegraphics[scale=.25]
         {Figures/cube.png}
         \caption{Ejemplo de agregaciones y reducciones usando cubos temporales.}
-        \label{fig:img_mens}
+        \label{fig:img_mens_agg}
 \end{figure}
 
 
-\begin{figure}[ht]
-        \centering
-        \includegraphics[scale=.30]
-        {Figures/mensualimg_.png}
-        \caption{Imágenes medianas mensuales de la serie histórica.}
-        \label{fig:img_mens}
-\end{figure}
+
 
 \section{Segmentación de las imágenes}
 
-En este trabajo se toma como referencia la metodología \emph{DeepAqua}\cite{DeepAqua2023}, que aplica arquitecturas de redes neuronales convolucionales tipo U-Net para la detección y cartografía de cuerpos de agua en imágenes satelitales. 
+En este trabajo se toma como referencia la metodología \emph{DeepAqua} \cite{DeepAqua2023}, que aplica arquitecturas de redes neuronales convolucionales tipo U-Net para la detección y cartografía de cuerpos de agua en imágenes satelitales, un diagrama del proceso se presenta en la figura \ref{fig:esq_aqua}.
 
 \begin{figure}[ht]
         \centering
         \includegraphics[scale=.20]
         {Figures/deep_2.png}
         \caption{Esquema de trabajo Teacher-Student para clasificación.}
-        \label{fig:img_mens}
+        \label{fig:esq_aqua}
 \end{figure}
 
-\subsection{U-Net mediante etiquetado débil (student--teacher)}
-Para evitar el etiquetado manual, se adoptó una estrategia \emph{student--teacher} (distilación de conocimiento). Se seleccionó aleatoriamente un 5\% de los meses del cubo mensual imputado; sobre ese subconjunto se calculó NDWI mensual y se aplicó un umbral \ de 0{,}15 para binarizar agua/no agua (rol \emph{teacher}). Estas máscaras sirvieron como \emph{pseudo-etiquetas} para entrenar una CNN tipo U-Net \parencite{ronneberger2015unet}, usando como entrada las bandas ópticas del mismo mes.
+\subsection{U-Net mediante etiquetado débil (\textit{student--teacher})}
+Para evitar el etiquetado manual, se adoptó una estrategia \emph{student--teacher} (distilación de conocimiento). Se seleccionó aleatoriamente un 5\% de los meses del cubo mensual imputado; sobre ese subconjunto se calculó el NDWI mensual y se aplicó un umbral \ de 0{,}15 para binarizar \texttt{agua/no agua} (rol \emph{teacher}). Estas máscaras sirvieron como pseudo-etiquetas para entrenar una CNN tipo U-Net \parencite{ronneberger2015unet}, usando como entrada las bandas ópticas del mismo mes.
 
-La U-Net (\emph{student}) aprendió un mapeo robusto a partir de pseudo-etiquetas ruidosas, aprovechando regularización espacial y multiescala propias de la arquitectura. Una vez entrenado el modelo, se segmentaron \emph{todos} los meses del cubo, reemplazando la binarización por umbral con predicciones consistentes espacial y temporalmente. Este esquema reduce sesgo por umbrales fijos y evita la dependencia de etiquetas manuales, en línea con la idea de \emph{distilación} \parencite{hinton2015distilling}. 
+La U-Net (\emph{student}) aprendió un mapeo robusto a partir de pseudo-etiquetas ruidosas, aprovechando las características  de regularización espacial y multiescala propias de la arquitectura. Una vez entrenado el modelo, se segmentaron todos los meses del cubo, reemplazando la binarización por umbral con predicciones consistentes espacial y temporalmente. Este esquema reduce sesgo por umbrales fijos y evita la dependencia de etiquetas manuales, en línea con la idea de distilación \parencite{hinton2015distilling}. 
 
 La arquitectura utilizada corresponde a una U-Net de pequeña escala (\textit{UNetSmall}), diseñada específicamente para tareas de segmentación binaria. El modelo se estructura en tres bloques principales:
 
@@ -334,7 +303,7 @@ La arquitectura utilizada corresponde a una U-Net de pequeña escala (\textit{UN
     \item Capa de salida: una convolución $1 \times 1$ genera el mapa binario final, en este caso indicando presencia o ausencia de agua.
 \end{itemize}
 
-Este diseño mantiene la filosofía de la U-Net original \parencite{ronneberger2015unet}, pero adaptado a una escala reducida, lo que lo hace más eficiente para trabajar con cubos de imágenes mensuales de resolución moderada. A continuación se presenta las imágenes una imagen usada en el entrenamiendo con los pares student-teacher~\ref{fig:agg_mens}.
+Este diseño mantiene la filosofía de la U-Net original, pero adaptado a una escala reducida, lo que lo hace más eficiente para trabajar con cubos de imágenes mensuales de resolución moderada. En la figura~\ref{fig:class_2} se presenta un ejemplo de las imágenes usadas en el entrenamiento con los pares \textit{student-teacher}.
 
 
 \begin{figure}[ht]
@@ -347,9 +316,9 @@ Este diseño mantiene la filosofía de la U-Net original \parencite{ronneberger2
 
 
 
-Las máscaras mensuales segmentadas por U-Net se convirtieron a área de agua por mes mediante conteo de píxeles y área efectiva de cada píxel. A continuación se presenta la serie de tiempo resultante del proceso de modelado~\ref{fig:ts_cnn}.
+Las máscaras mensuales segmentadas por U-Net se convirtieron a área de agua por mes mediante conteo de píxeles y área efectiva de cada píxel.La serie de tiempo resultante del proceso de modelado se muestra en la figura~\ref{fig:ts_cnn}.
 
-Esta serie mensual de \emph{Área} es la base de los análisis de series temporales y los modelos SARIMA/VAR.
+Esta serie mensual de \texttt{Área} es la base de los análisis de series temporales y los modelos SARIMA/VAR.
 
 \begin{figure}[ht]
         \centering
@@ -362,7 +331,7 @@ Esta serie mensual de \emph{Área} es la base de los análisis de series tempora
 
 \section{Datos climáticos globales}
 
-Como complemento a la información satelital, se integraron series temporales mensuales de los principales índices asociados al fenómeno ENSO. Estos indicadores ya han sido presentados en el Capítulo~\ref{Chapter2}; en esta sección se detalla únicamente el tratamiento aplicado para su incorporación en el análisis.
+Como complemento a la información satelital, se integraron series temporales mensuales de los principales índices asociados al fenómeno ENSO. Estos indicadores ya han sido presentados en el Capítulo~\ref{Chapter2}; en esta sección se detalla únicamente el tratamiento aplicado para su incorporación en el análisis. Un detalle de las variables ENSO se presenta a continuación:
 
 \begin{itemize}
     \item ONI (Oceanic Niño Index): se descargaron los valores mensuales publicados por la NOAA, calculados a partir de anomalías de temperatura superficial del mar en la región Niño 3.4 \parencite{noaaONI}. La serie fue recortada al período de análisis (1984--2022) y estandarizada mediante transformación a \textit{z-score}. Los resultados se muestran en la Figura~\ref{fig:indice_oni}.
@@ -397,9 +366,10 @@ En la figura ~\ref{fig:ts_final} se muestran las series temporales resultantes.
         \caption{Series temporales procesadas.}
         \label{fig:ts_final}
 \end{figure}
-
+\FloatBarrier 
+ 
 \section{Exploración y tratamiento de las series temporales}
-En esta sección se realiza una exploración de las variables a trabajar. Además, se realizan análisis visuales y comparaciones entre las variables. 
+En esta sección se realiza una exploración de las variables consideradas. Además, se realizan análisis visuales y comparaciones entre las variables. 
 
 \subsection{Raíces unitarias}
 
@@ -408,7 +378,7 @@ series para explorar posibles tendencias o comportamientos no estacionarios. De 
 preliminar, se observaron los siguientes patrones:
 
 \begin{itemize}
-    \item Serie Área (superficie de agua): muestra una tendencia descendente a lo 
+    \item Serie \texttt{Área} (superficie de agua): muestra una tendencia descendente a lo 
     largo del período analizado, disminuyendo de valores cercanos a 0,8 hacia 0,2. Este 
     comportamiento sugiere la presencia de una deriva temporal y, por lo tanto, 
     no estacionariedad en media.
@@ -421,7 +391,7 @@ Para corroborar estas observaciones se aplicó la prueba de Dickey-Fuller aument
 
 \begin{table}[H]
     \centering
-    \caption{Resultados del test Dickey-Fuller aumentado (ADF)}.
+    \caption{Resultados del test Dickey-Fuller aumentado (ADF).}
     \label{tab:adf_test}
     \begin{tabular}{lccc}
         \toprule
@@ -438,7 +408,7 @@ Para corroborar estas observaciones se aplicó la prueba de Dickey-Fuller aument
 Según los tests realizados es posible interpretar lo siguiente:   
 \begin{itemize}
     \item ONI, SOI y MEI: resultaron fuertemente estacionarios, con p-valores 
-    iguales a 0.000008 y estadísticos ADF muy por debajo de los valores críticos al 1\%. 
+    iguales a 0,000008 y estadísticos ADF muy por debajo de los valores críticos al 1\%. 
     Esto confirma su patrón oscilatorio estable alrededor de cero.
     \item Área: se ubicó en el límite de la estacionariedad, con un p-valor de 
     0,0465 y un estadístico ADF menor al valor crítico al 5\% pero no al 1\%. Aunque el 
@@ -461,20 +431,20 @@ la selección de órdenes iniciales para modelos ARIMA o SARIMA \parencite{box20
 
 \subsubsection{Variable ONI}
 
-La ACF del ONI(~\ref{fig:facp_oni}) muestra un decaimiento lento y oscilatorio, típico de procesos con memoria 
+La ACF del ONI (~\ref{fig:facp_oni}) muestra un decaimiento lento y oscilatorio, típico de procesos con memoria 
 larga y comportamiento cíclico (El Niño / La Niña). La PACF evidencia un corte abrupto 
 tras los primeros rezagos (lag 1 o 2), lo que sugiere que un modelo autorregresivo de bajo 
 orden (AR(1) o AR(2)) podría capturar adecuadamente su estructura.
 
 \subsubsection{Variable SOI}
 
-La ACF del SOI(~\ref{fig:facp_soi}) presenta un patrón de decaimiento oscilatorio persistente, con memoria de 
+La ACF del SOI (~\ref{fig:facp_soi}) presenta un patrón de decaimiento oscilatorio persistente, con memoria de 
 largo plazo. La PACF muestra un corte tras los primeros rezagos (lag 1–2), indicando que 
 un modelo AR(2) constituye un buen punto de partida para esta serie.
 
 \subsubsection{Variable MEI}
 
-El MEI exhibe un patrón similar al ONI y SOI: la ACF(~\ref{fig:facp_mei}) decae lentamente con oscilaciones, 
+El MEI exhibe un patrón similar al ONI y SOI: la ACF (~\ref{fig:facp_mei}) decae lentamente con oscilaciones, 
 mientras que la PACF se corta tras los primeros rezagos. Esto indica la presencia de 
 dependencia temporal y ciclos ENSO, siendo un modelo AR(1)–AR(2) adecuado como 
 aproximación inicial.
@@ -490,8 +460,8 @@ partida razonable.
 \subsection{Resumen comparativo de ACF, PACF y estadísticos descriptivos}
 
 Para complementar el análisis visual, se calcularon los primeros 10 rezagos de la función 
-de autocorrelación (FAC) y la función de autocorrelación parcial (FACP) para cada serie. 
-Asimismo, se presentan sus estadísticas descriptivas básicas. 
+de autocorrelación (FAC, ver tabla \ref{tab:fac}) y la función de autocorrelación parcial (FACP, ver tabla \ref{tab:facp}) para cada serie. 
+Asimismo, se presentan sus estadísticas descriptivas básicas, ver tabla \ref{tab:descriptivos}. 
 
 \begin{table}[H]
     \centering
@@ -528,7 +498,7 @@ Asimismo, se presentan sus estadísticas descriptivas básicas.
 
 \begin{table}[H]
     \centering
-    \caption{Estadísticos descriptivos de las series}.
+    \caption{Estadísticos descriptivos de las series.}
     \label{tab:descriptivos}
     \begin{tabular}{lcccccc}
         \toprule
@@ -545,21 +515,21 @@ Asimismo, se presentan sus estadísticas descriptivas básicas.
 
 De acuerdo a los resultados precedentes es posible resumir las métricas en lo siguiente:
 \begin{itemize}
-    \item ONI: La FAC presenta autocorrelación muy fuerte en los primeros rezagos 
+    \item ONI: la FAC presenta autocorrelación muy fuerte en los primeros rezagos 
     (0,96 en lag 1), confirmando memoria persistente y patrón oscilatorio. La PACF muestra 
     un corte abrupto tras el lag 1–2, lo que sugiere un modelo autorregresivo de bajo orden 
     (AR(1)–AR(2)).
     
-    \item SOI: También evidencia fuerte dependencia temporal, con FAC significativa 
+    \item SOI: también evidencia fuerte dependencia temporal, con FAC significativa 
     hasta varios rezagos y PACF con corte en lag 1–2. Sus valores extremos y desviación 
     estándar elevada (±10) confirman alta variabilidad climática. Un modelo AR(2) es adecuado 
     como punto de partida.
     
-    \item MEI: Exhibe un comportamiento casi idéntico al ONI, con FAC alta en los 
+    \item MEI: exhibe un comportamiento casi idéntico al ONI, con FAC alta en los 
     primeros rezagos (0,95 en lag 1) y PACF con caída tras lag 1–2. Esto refleja la estructura 
     oscilatoria de ENSO. Un modelo AR(1)–AR(2) es consistente.
     
-    \item Área: Aunque la FAC arranca alta (0.64), decae rápidamente con rezagos, 
+    \item Área: aunque la FAC arranca alta (0.64), decae rápidamente con rezagos, 
     sugiriendo fuerte tendencia de fondo. La PACF muestra un pico en lag 1 y caída posterior, 
     lo que indica necesidad de diferenciación (I=1) antes de ajustar un modelo ARIMA. La media 
     baja (0,22) y la dispersión estrecha confirman que los cambios son más lentos y dominados 
@@ -570,7 +540,7 @@ De acuerdo a los resultados precedentes es posible resumir las métricas en lo s
 
 
 Como conclusión general, se puede mencionar que las series climáticas (ONI, SOI, MEI) muestran 
-estacionariedad con memoria corta, modelables con AR(1)–AR(2). En contraste, la serie 
+estacionariedad con memoria corta, modelables con AR(1), AR(2). En contraste, la serie 
 Área no es estacionaria y requiere diferenciación previa; tras este paso, un modelo AR(1) 
 o SARIMA con estacionalidad anual resulta más adecuado.
 
@@ -582,11 +552,14 @@ El análisis posterior de autocorrelación mostró un comportamiento mucho más 
 valores de FAC y FACP cercanos a cero en los primeros rezagos, y ausencia de patrones de 
 dependencia prolongada.
 
-
+Las tres pruebas (ADF, KPSS y PP, ver tabla \ref{tab:ru_area_diff}) coinciden en rechazar la hipótesis de no estacionariedad, 
+confirmando que la serie diferenciada es estacionaria. Este resultado valida la 
+necesidad del preprocesamiento y garantiza que la serie \texttt{Área\_diff} puede ser utilizada en 
+modelos ARIMA o SARIMA con mayor robustez. 
 
 \begin{table}[H]
     \centering
-    \caption{Resultados de pruebas de estacionariedad aplicadas a Área\_diff.}
+    \caption{Resultados de pruebas de estacionariedad aplicadas a \texttt{Área\_diff}.}
     \label{tab:ru_area_diff}
     \begin{tabular}{lccc}
         \toprule
@@ -598,11 +571,5 @@ dependencia prolongada.
         \bottomrule
     \end{tabular}
 \end{table}
-
-Las tres pruebas (ADF, KPSS y PP) coinciden en rechazar la hipótesis de no estacionariedad, 
-confirmando que la serie diferenciada es estacionaria. Este resultado valida la 
-necesidad del preprocesamiento y garantiza que la serie Área\_diff puede ser utilizada en 
-modelos ARIMA o SARIMA con mayor robustez. 
-
 
 

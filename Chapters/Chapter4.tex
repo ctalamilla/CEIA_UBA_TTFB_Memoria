@@ -3,7 +3,7 @@
 \chapter{Ensayos y resultados} % Main chapter title
 
 \label{Chapter4} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
-En este capítulo se presentan los resultados obtenidos de los ensayos realizados, los cuales incluyen, pero no se limitan a: resultado de la segmentación CNN U-Net. para la obtención de la serie temporal de superficie de agua de la laguna, resultados de modelado SARIMA para todas las series temporales estudiadas, resultado del modelado VAR y por último los resultados de la aplicación de rolling forecasting a las variables área. 
+En este capítulo se presentan los resultados obtenidos de los ensayos realizados, que incluyen, pero no se limitan a: resultado de la segmentación CNN U-Net para la obtención de la serie temporal de superficie de agua de la laguna, resultados de modelado SARIMA para todas las series temporales estudiadas, resultado del modelado VAR y, por último, los resultados de la aplicación de rolling forecasting a las variables área. 
 
 %----------------------------------------------------------------------------------------
 %	SECTION 1
@@ -11,10 +11,10 @@ En este capítulo se presentan los resultados obtenidos de los ensayos realizado
 
 \section{Segmentación mensual con U-Net: resultados operativos}
 
-La segmentación automática de cuerpos de agua se implementó con una arquitectura U-Net \citep{ronneberger2015unet} entrenada bajo el esquema \textit{student–teacher} \citep{hinton2015distilling}. El objetivo fue obtener una serie mensual continua de cobertura de agua superficial, evitando la necesidad de etiquetado manual masivo. Para ello, se empleó un 5\% de las imágenes del cubo temporal mensual, generando las etiquetas a partir del NDWI umbralizado ($>0,15$). El modelo resultante se aplicó a la totalidad de imágenes del período 1984–2022.
+La segmentación automática de cuerpos de agua se implementó con una arquitectura U-Net entrenada bajo el esquema \textit{student–teacher}. El objetivo fue obtener una serie mensual continua de cobertura de agua superficial, evitando la necesidad de etiquetado manual masivo. Para ello, se empleó un 5\% de las imágenes del cubo temporal mensual, generando las etiquetas a partir del NDWI umbralizado (>0,15). El modelo resultante se aplicó a la totalidad de imágenes del período 1984–2022.
 
 \subsection{Curvas de entrenamiento y validación}
-En la figura~\ref{fig:unet_training} se muestran las curvas de entrenamiento y validación de la red U-Net, utilizando como función de pérdida la \textit{Binary Cross Entropy} (BCE). Se observa una disminución rápida de la pérdida durante las primeras 15 épocas, seguida de una convergencia estable hacia valores próximos a cero. La similitud entre las curvas de entrenamiento y validación indica un buen equilibrio entre ajuste y generalización, sin evidencias de sobreajuste. El mejor desempeño en validación se alcanzó en la época 78, lo que confirma la capacidad del modelo para segmentar de manera consistente las áreas de agua a partir de las imágenes Landsat.
+En la figura~\ref{fig:unet_training} se muestran las curvas de entrenamiento y validación de la red U-Net, utilizando \textit{Binary Cross Entropy} (BCE) como función de pérdida. Se observa una disminución rápida de dicha pérdida durante las primeras 15 épocas, seguida de una convergencia estable hacia valores próximos a cero. La similitud entre las curvas de entrenamiento y validación indica un buen equilibrio entre ajuste y generalización. El mejor desempeño en validación se alcanzó en la época 78, lo que confirma la capacidad del modelo para segmentar de manera consistente las áreas de agua a partir de las imágenes Landsat.
 
 \begin{figure}[H]
     \centering
@@ -28,19 +28,16 @@ La figura~\ref{fig:unet_examples} muestra ejemplos representativos de la segment
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.32]{Figures/unet_examples.png}
+    \includegraphics[scale=0.31]{Figures/unet_examples.png}
     \caption{Ejemplos de segmentación mensual: comparación entre imágenes Landsat (falso color) y máscaras U-Net.}
     \label{fig:unet_examples}
 \end{figure}
-
-\subsection{Consistencia temporal}
-La figura ~\ref{fig:ts_final} ilustra la serie temporal del área de agua derivada de la segmentación U-Net. La dinámica temporal reproduce patrones estacionales y anomalías coherentes con la climatología regional, validando la estabilidad del procedimiento. Esta serie constituye la base de los modelos de predicción temporal desarrollados en las secciones SARIMA.
 
 \subsection{Probabilidad mensual de agua}
 
 A partir del cubo temporal clasificado con la U-Net se calculó, para cada mes del período de análisis, la probabilidad de ocurrencia de agua. Este cálculo se realizó como la proporción de píxeles clasificados como agua sobre el total de píxeles de la laguna en el mes correspondiente. De esta manera, se obtuvo una serie temporal mensual de probabilidades que permite evaluar la consistencia del modelo y la dinámica hidrológica en escalas estacionales e interanuales.
 
-En la figura~\ref{fig:prob_agua_mensual} se presenta un ejemplo gráfico de estos resultados. Se observa la variabilidad temporal de la probabilidad de agua, con máximos que coinciden con períodos de mayor extensión superficial y mínimos en fases de retracción. Este producto constituye un insumo clave para la modelización temporal desarrollada en los capítulos siguientes, pues resume la dinámica de la laguna en una métrica probabilística derivada de la clasificación automática.
+En la figuras~\ref{fig:prob_agua_mensual} y figura~\ref{fig:prob_agua_mensual2} se presentan ejemplos gráficos de estos resultados. Se observa la variabilidad temporal de la probabilidad de agua, con máximos que coinciden con períodos de mayor extensión superficial y mínimos en fases de retracción. Este producto constituye un insumo clave para la modelización temporal desarrollada en los capítulos siguientes, pues resume la dinámica de la laguna en una métrica probabilística derivada de la clasificación automática.
 
 \begin{figure}[H]
     \centering
@@ -58,19 +55,19 @@ En la figura~\ref{fig:prob_agua_mensual} se presenta un ejemplo gráfico de esto
 
 \section{Modelado con SARIMA}
 
-El modelo SARIMA (\textit{Seasonal ARIMA}) fue optimizado para cada una de las series de interés (ONI, SOI, MEI y Área), evaluando diferentes combinaciones de parámetros $(p,d,q)\times(P,D,Q,s)$ y seleccionando los mejores ajustes según el criterio de información de Akaike (AIC). 
+El modelo SARIMA (\textit{Seasonal ARIMA}) fue optimizado para cada una de las series de interés (ONI, SOI, MEI y \texttt{Área}), evaluando diferentes combinaciones de parámetros $(p,d,q)\times(P,D,Q,s)$ y seleccionando los mejores ajustes según el criterio de información de Akaike (AIC). 
 
-\subsection{ONI}
-El mejor modelo seleccionado para ONI fue SARIMA$(2,0,1)\times(1,1,2)_{12}$, con un AIC de $-410.64$. Este modelo supera en desempeño a alternativas cercanas como SARIMA$(2,0,2)\times(1,1,2)_{12}$ y SARIMA$(2,0,0)\times(1,1,2)_{12}$, confirmando que la estructura óptima incluye un componente autorregresivo de orden 2 y un componente de media móvil de orden 1.
+\subsection{Variable ONI}
+El mejor modelo seleccionado para ONI fue SARIMA$(2,0,1)\times(1,1,2)_{12}$, con un AIC de $-410.64$. Este modelo supera en desempeño a alternativas cercanas como SARIMA$(2,0,2)\times(1,1,2)_{12}$ y SARIMA$(2,0,0)\times(1,1,2)_{12}$ y confirma que la estructura óptima incluye un componente autorregresivo de orden 2 y un componente de media móvil de orden 1.
 
-\subsection{SOI}
+\subsection{Variable SOI}
 En el caso de SOI, el mejor modelo corresponde a SARIMA$(1,0,2)\times(2,1,2)_{12}$, con un AIC de $2842.34$. Aunque este valor absoluto es elevado (debido a la alta varianza intrínseca de la serie), la comparación relativa muestra que es la configuración más adecuada frente a otras alternativas con órdenes similares.
 
-\subsection{MEI}
-La serie MEI fue mejor explicada por SARIMA$(2,0,2)\times(1,1,2)_{12}$, alcanzando un AIC de $126.37$. Este modelo captura tanto la persistencia como los patrones estacionales de la serie, y presenta una ventaja clara frente a otros candidatos como SARIMA$(1,0,1)\times(1,1,2)_{12}$ y SARIMA$(2,0,1)\times(1,1,2)_{12}$.
+\subsection{Variable MEI}
+La serie MEI fue mejor explicada por SARIMA$(2,0,2)\times(1,1,2)_{12}$, y alcanzó un AIC de $126.37$. Este modelo captura tanto la persistencia como los patrones estacionales de la serie, y presenta una ventaja clara frente a otros candidatos como SARIMA$(1,0,1)\times(1,1,2)_{12}$ y SARIMA$(2,0,1)\times(1,1,2)_{12}$.
 
-\subsection{Área y Área\_diff}
-Para la serie Área sin diferenciar, el mejor modelo fue SARIMA$(1,0,0)\times(1,0,1)_{12}$ con un AIC de $-902.08$. Sin embargo, al diferenciar la serie (Área\_diff), se obtuvo como mejor ajuste el modelo SARIMA$(2,0,1)\times(1,0,1)_{12}$ con un AIC de $-888.19$. Aunque el AIC es ligeramente menos favorable tras la diferenciación, los análisis de raíces unitarias y métricas de predicción (ver subsección anterior) mostraron que el modelo diferenciado ofrece mayor robustez y estacionariedad.
+\subsection{Variables Área y Área\_diff}
+Para la serie \texttt{Área} sin diferenciar, el mejor modelo fue SARIMA$(1,0,0)\times(1,0,1)_{12}$ con un AIC de $-902.08$. Sin embargo, al diferenciar la serie (\texttt{Área\_diff}), se obtuvo como mejor ajuste el modelo SARIMA$(2,0,1)\times(1,0,1)_{12}$ con un AIC de $-888.19$. Aunque el AIC es ligeramente menos favorable tras la diferenciación, los análisis de raíces unitarias y métricas de predicción (ver subsección anterior) mostraron que el modelo diferenciado ofrece mayor robustez y estacionariedad.
 
 \begin{table}[H]
     \centering
@@ -89,12 +86,12 @@ Para la serie Área sin diferenciar, el mejor modelo fue SARIMA$(1,0,0)\times(1,
     \label{tab:sarima_modelos}
 \end{table}
 
-En síntesis, el procedimiento de optimización permitió identificar configuraciones distintas para cada serie, adaptadas a sus características temporales. En los siguientes apartados se evaluará la performance predictiva de estos modelos sobre los conjuntos de test.
+En síntesis, el procedimiento de optimización permitió identificar configuraciones distintas para cada serie, adaptadas a sus características temporales, ver tabla \ref{tab:sarima_modelos}. En los siguientes apartados se evaluará la performance predictiva de estos modelos sobre los conjuntos de test.
 
 \section{Evaluación de los modelos SARIMA}
 
 Se evaluó el desempeño predictivo de los modelos SARIMA seleccionados para las series
-ONI, SOI, MEI, \emph{Área} y \emph{Área\_diff}, considerando: métricas de error en el
+ONI, SOI, MEI, \texttt{Área} y \texttt{Área\_diff}, considerando: métricas de error en el
 conjunto de test (MSE, MAE, RMSE y MAPE cuando aplica), diagnóstico de residuos
 (residuos en el tiempo, ACF/PACF de residuos, normalidad aproximada y test de Ljung--Box),
 y parsimonia y significancia de coeficientes (AIC/BIC, $p$--valores).
@@ -109,7 +106,7 @@ Se consideró que un modelo es adecuado cuando:
 \end{itemize}
 
 \subsection{Resultados por serie y diagnóstico}
-Se incluyen los siguientes gráficos de diagnóstico, los cuales pueden verse en el Apéndice de figuras:
+En el apéndice de figuras \ref{AppendixA} se incluyen los siguientes gráficos y resultados:
 
 \begin{itemize}
     \item Residuos en el tiempo.  
@@ -119,69 +116,58 @@ Se incluyen los siguientes gráficos de diagnóstico, los cuales pueden verse en
     \item Serie observada (train+test) versus predicciones con intervalo de confianza al 95\%.  
 \end{itemize}
 
-\subsubsection{ONI} 
-Modelo SARIMA$(2,0,1)\times(1,1,2)_{12}$ (AIC $\approx -410.6$). 
-Los coeficientes no estacionales AR(2) y MA(1) son altamente significativos y capturan la
-dinámica de corto plazo; sin embargo, los términos estacionales no resultan
-significativos. El test Jarque--Bera rechaza normalidad y se observa heterocedasticidad,
-pero los residuos no presentan autocorrelación relevante. En test: 
-MSE $=0.683$, MAE $=0.631$, RMSE $=0.826$. En las figuras~\ref{fig:res_oni} y~\ref{fig:pred_oni} se pueden apreciar los residuos del modelo y las predicciones para el conjunto de test.
+\subsubsection{Evaluación de la serie ONI} 
+El análisis se llevó a cabo con el modelo SARIMA$(2,0,1)\times(1,1,2)_{12}$ (AIC $\approx -410.6$). 
+Los coeficientes no estacionales AR(2) y MA(1) resultaron altamente significativos, lo que permitió capturar de manera adecuada la dinámica de corto plazo. En contraste, los términos estacionales no alcanzaron significancia estadística. El test de Jarque--Bera rechazó la hipótesis de normalidad y se detectó heterocedasticidad; sin embargo, los residuos no mostraron autocorrelaciones relevantes.  
+En el conjunto de datos de prueba, las métricas de desempeño fueron MSE $=0.683$, MAE $=0.631$ y RMSE $=0.826$. En las figuras~\ref{fig:res_oni} y~\ref{fig:pred_oni} se ilustran los residuos del modelo y las predicciones sobre el set de test.  
 
-Conclusión: buen ajuste de la dinámica no estacional; recomendable
-simplificar la parte estacional (evaluar ARIMA$(2,0,1)$ sin estacionalidad) y re‐chequear
-residuos.
+Conclusión: el modelo logra un buen ajuste de la dinámica no estacional; se recomienda simplificar la parte estacional (evaluar un ARIMA$(2,0,1)$ sin componente estacional) y volver a examinar los residuos.  
 \vspace{0.3em}
 
 
+\subsubsection{Evaluación de la serie SOI}
+El análisis de la serie SOI se realizó mediante el modelo SARIMA$(1,0,2)\times(2,1,2)_{12}$ (AIC $\approx 2116$). 
+Los parámetros AR(1), MA(1) y varios términos estacionales resultaron significativos, mientras que el MA(2) y el AR estacional a 24 meses no lo fueron. Los residuos no evidenciaron autocorrelación (test Ljung--Box con $p>0.05$), aunque presentaron una ligera desviación respecto de la normalidad.  
+En el conjunto de prueba, las métricas obtenidas fueron MSE $=88.00$, MAE $=7.64$ y RMSE $=9.38$. Las figuras~\ref{fig:res_soi} y~\ref{fig:pred_soi} muestran tanto los residuos como las predicciones en el set de validación.  
 
-
-\subsubsection{SOI}
-Modelo SARIMA$(1,0,2)\times(2,1,2)_{12}$ (AIC $\approx 2116$).
-AR(1), MA(1) y varios términos estacionales son significativos. MA(2) y AR estacional en
-$24$ meses no son significativos. Residuos sin autocorrelación (Ljung--Box con $p>0.05$) y con leve
-no normalidad. En test: MSE $=88.00$, MAE $=7.64$, RMSE $=9.38$. En las figuras~\ref{fig:res_soi} y~\ref{fig:pred_soi} se pueden apreciar los residuos del modelo y las predicciones para el conjunto de test.
-
-Conclusión: desempeño predictivo insuficiente para la escala del SOI. Es conveniente simplificar y eliminar términos no significativos además de explorar transformaciones robustas.
+Conclusión: el modelo presenta un desempeño predictivo limitado en relación con la escala del SOI. Resulta conveniente simplificar la estructura, eliminando términos no significativos y explorando transformaciones más robustas.  
 \vspace{0.3em}
 
 
-\subsubsection{MEI}
-Modelo SARIMA$(2,0,2)\times(1,1,2)_{12}$ (AIC $\approx 126.4$).
-AR(1), AR(2) y MA(1) no estacionales son muy significativos. El modelo MA(2) es marginal. 
-En la parte estacional sólo AR a 12 meses es relevante. Los términos MA estacionales no lo son.
-Residuos sin autocorrelación (Ljung--Box con $p\approx 0,84$), con colas algo pesadas.
-En test: MSE $=0,821$, MAE $=0,725$, RMSE $=0,906$. En las figuras~\ref{fig:res_mei} y~\ref{fig:pred_mei} se pueden apreciar los residuos del modelo y las predicciones para el conjunto de test.
+\subsubsection{Evaluación de la serie MEI}
+La serie MEI fue modelada mediante un SARIMA$(2,0,2)\times(1,1,2)_{12}$ (AIC $\approx 126.4$). 
+Los coeficientes no estacionales AR(1), AR(2) y MA(1) mostraron gran significancia, mientras que MA(2) se comportó de manera marginal. En la componente estacional, únicamente el término AR a 12 meses resultó relevante, mientras que los términos MA estacionales no aportaron significativamente. Los residuos no evidenciaron autocorrelación (Ljung--Box con $p\approx 0,84$), aunque presentaron colas algo pesadas.  
+En el conjunto de prueba se obtuvieron las métricas: MSE $=0.821$, MAE $=0.725$ y RMSE $=0.906$. Las figuras~\ref{fig:res_mei} y~\ref{fig:pred_mei} presentan los residuos y las predicciones sobre el set de test.  
 
-Conclusión: buen comportamiento predictivo. En trabajos futuros seria oportuno simplificar
-la estacionalidad (p.\,ej., SARIMA$(2,0,1)\times(1,1,0)_{12}$) y verificar residuos.
+Conclusión: el modelo ofrece un desempeño predictivo sólido. En futuros trabajos sería apropiado simplificar la parte estacional (p.\,ej., SARIMA$(2,0,1)\times(1,1,0)_{12}$) y revisar nuevamente el comportamiento de los residuos.  
 \vspace{0.3em}
 
 
-\subsubsection{Área (sin diferenciar)}
-Modelo SARIMA$(1,0,0)\times(1,0,1)_{12}$ 
-(AIC $\approx -902.1$). Todos los coeficientes son significativos; el término AR estacional
-es muy alto ($\approx 0.996$), lo que sugiere posible necesidad de diferenciación
-estacional. Los residuos no presentan autocorrelación, aunque con no normalidad.
-En test: MSE $=0,02499$, MAE $=0,119$, RMSE $=0,158$. En las figuras~\ref{fig:res_area} y~\ref{fig:pred_area} se pueden apreciar los residuos del modelo y las predicciones para el conjunto de test.
+\subsubsection{Evaluación de la serie Área (sin diferenciar)}
+La serie \texttt{Área}, sin diferenciación, se ajustó con un modelo SARIMA$(1,0,0)\times(1,0,1)_{12}$ (AIC $\approx -902.1$). 
+Todos los coeficientes estimados resultaron significativos, destacándose un coeficiente AR estacional elevado ($\approx 0.996$), lo que sugiere la conveniencia de considerar diferenciación estacional. Los residuos no mostraron autocorrelaciones relevantes, aunque presentaron cierta desviación respecto de la normalidad.  
+En el conjunto de datos de prueba, los resultados fueron MSE $=0.02499$, MAE $=0.119$ y RMSE $=0.158$. Las figuras~\ref{fig:res_area} y~\ref{fig:pred_area} ilustran tanto los residuos como las predicciones generadas por el modelo.  
 
-Conclusión: buen ajuste en escala de la serie; aun así, la magnitud de AR estacional sugiere evaluar un $D=1$ para mayor estabilidad.
+Conclusión: el ajuste es adecuado en la escala de la serie; no obstante, la elevada magnitud del AR estacional sugiere evaluar un $D=1$ para garantizar mayor estabilidad.  
 \vspace{0.3em}
 
 
-\subsubsection{Área\_diff (diferenciada)}
-Modelo SARIMA$(2,0,1)\times(1,0,1)_{12}$
-(AIC $\approx -888.2$). Los residuos presentan comportamiento de ruido blanco (ACF/PACF dentro
-de bandas, Ljung--Box con $p>0,05$), normalidad aproximada y métricas de error muy bajas:
-MSE $=0.01782$, MAE $=0,0910$, RMSE $=0,1335$, MAPE $=1,70\%$. En las figuras~\ref{fig:res_area_d} y~\ref{fig:pred_area_d} se pueden apreciar los residuos del modelo y las predicciones para el conjunto de test.
+\subsubsection{Evaluación de la serie Área\_diff (diferenciada)}
+Finalmente, para la serie diferenciada \texttt{Área\_diff}, se aplicó un modelo SARIMA\\$(2,0,1)\times(1,0,1)_{12}$ (AIC $\approx -888.2$). 
+Los residuos se comportaron como ruido blanco (ACF/PACF dentro de las bandas de confianza, Ljung--Box con $p>0,05$), presentando además una distribución cercana a la normalidad.  
+En el conjunto de prueba, el desempeño fue particularmente destacable: MSE $=0.01782$, MAE $=0.0910$, RMSE $=0.1335$ y MAPE $=1.70\%$. En las figuras~\ref{fig:res_area_d} y~\ref{fig:pred_area_d} se visualizan los residuos y las predicciones en el set de test.
 
-Conclusión:buen desempeño y mayor robustez estadística tras la diferenciación esto valida el preprocesamiento efectuado (ver sección de raíces unitarias).
+
+Conclusión: el modelo muestra un comportamiento predictivo muy satisfactorio. A futuro, podría considerarse una estructura aún más parsimoniosa y realizar verificaciones adicionales de los residuos.  
+\vspace{0.3em}
+
 
 
 En la tabla~\ref{tab:metricas_sarima} se pueden observar las métricas para los modelos SARIMA para variables analizadas. 
 
 \begin{table}[H]
 \centering
-\caption{Resumen de métricas de desempeño en test para modelos SARIMA}
+\caption{Resumen de métricas de desempeño en test para modelos SARIMA.}
 \label{tab:metricas_sarima}
 \begin{tabular}{lcccc}
 \toprule
@@ -191,40 +177,40 @@ ONI  & 0,683  & 0,631  & 0,826  & n/a \\
 SOI  & 88,003 & 7,639  & 9,381  & n/a \\
 MEI  & 0,821  & 0,725  & 0.906  & n/a \\
 Área (sin diff) & 0,02499 & 0,1190 & 0,1581 & n/a \\
-Área\_diff      & \textbf{0,01782} & \textbf{0,0910} & \textbf{0,1335} & \textbf{1,70\%} \\
+Área\_diff      & 0,01782 & 0,0910 & 0,1335 & 1,70\% \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Como resultado de la aplicación del modelo SARIMA en las series temporales a continuación se sintetizan los principales hallazgos.
+A continuación se sintetizan los principales hallazgos asociados a la aplicación del modelo SARIMA en las series temporales:
 
 \begin{itemize}
     \item Series ENSO (ONI, MEI): los componentes AR(2) y MA(1) no estacionales
     capturan bien la memoria de corto plazo; varios términos MA estacionales no son
-    significativos. .
+    significativos.
     \item Serie SOI: los residuos no muestran autocorrelación, las métricas de la precisión predictiva son altas.
-    \item Series Área vs. Área\_diff: ambos modelos presentan muy buen desempeño en test,
-    destacándose \emph{Área\_diff} con los errores más bajos y residuos más
+    \item Series \texttt{Área} vs. \texttt{Área\_diff}: ambos modelos presentan muy buen desempeño en test,
+    destacándose \texttt{Área\_diff} con los errores más bajos y residuos más
     estables.
 \end{itemize}
 
-En conjunto, la evidencia empírica muestra que la diferenciación de la serie \emph{Área}
+En conjunto, la evidencia empírica muestra que la diferenciación de la serie \texttt{Área}
 mejora la robustez y precisión del modelo, mientras que en las series ENSO una
 parametrización más parsimoniosa tiende a ser suficiente. El caso SOI requiere trabajo
 adicional para alcanzar niveles de error aceptables.
 
-\section{Modelado VAR (Vectores Autorregresivos)}
+\section{Modelado VAR (vectores autorregresivos)}
 
 El modelo VAR (\textit{Vector AutoRegressive}) es una técnica de series temporales multivariadas que permite capturar las interdependencias entre varias variables a lo largo del tiempo. A diferencia de los modelos univariados como ARIMA o SARIMA, el VAR considera que cada variable del sistema depende no solo de sus propios valores pasados, sino también de los valores pasados de las demás variables incluidas en el modelo \parencite{lutkepohl2005new}.
 
 El análisis VAR constituye la base para explorar relaciones causales entre las variables y evaluar la capacidad predictiva conjunta del sistema.
 
-\subsection{Prueba de Causalidad de Granger}
+\subsection{Prueba de causalidad de Granger}
 
 La prueba de causalidad de Granger evalúa si los valores pasados de una serie temporal contienen información útil para predecir otra serie, bajo el supuesto de relaciones lineales dentro de un modelo VAR \parencite{granger1969investigating}.
 La hipótesis nula (\(H_0\)) establece que “la serie X no causa Granger a la serie Y”. Un p-valor inferior a 0,05 permite rechazar la hipótesis nula, concluyendo que existe causalidad grangeriana.
 
-En este estudio, se aplicó la prueba con un máximo de 24 rezagos mensuales, obteniéndose la matriz de resultados presentada en la tabla~\ref{tab:granger_matrix}.
+En este estudio, se aplicó la prueba con un máximo de 24 rezagos mensuales, y se obtuvo la matriz de resultados presentada en la tabla~\ref{tab:granger_matrix}.
 
 \begin{table}[H]
     \centering
@@ -240,13 +226,15 @@ En este estudio, se aplicó la prueba con un máximo de 24 rezagos mensuales, ob
         Área\_y & 0,5889   & 0,0456$^{*}$ & 0,4557   & 1,0000   \\
         \bottomrule
     \end{tabular}
-        
+    \vspace{0.2cm}
+    
+    \raggedright \footnotesize{$^{*}$ Significativo al nivel del 5\% (p $<$ 0,05).}
 \end{table}
 
-A continuación se presenta una sintesis de los principales hallazgos obtenidos por la prueba de causalidad de Granger.
+A continuación se presenta una síntesis de los principales hallazgos obtenidos por la prueba de causalidad de Granger:
 \begin{itemize}
-    \item ONI\_y: sólo es causado por el MEI (p=0,014), lo que indica que la información del índice multivariado MEI contribuye a predecir al ONI.
-    \item SOI\_y: recibe causalidad de ONI, MEI y el Área, reflejando su carácter central como índice atmosférico.
+    \item ONI\_y: solo es causado por el MEI (p=0,014), lo que indica que la información del índice multivariado MEI contribuye a predecir al ONI.
+    \item SOI\_y: recibe causalidad de ONI, MEI y el \texttt{Área}y refleja su carácter central como índice atmosférico.
     \item MEI\_y: es causado por ONI y SOI, lo que confirma la fuerte interdependencia entre los índices climáticos de ENSO.
     \item Área\_y: solo es causada por el SOI (p=0,046), lo que evidencia que la variabilidad atmosférica influye directamente en la superficie de agua del salar.
 \end{itemize}
@@ -256,24 +244,31 @@ El análisis de causalidad de Granger confirma la interdependencia entre los tre
 
 \subsection{Modelo VAR: selección del orden y resultados}
 
-Para modelar la dinámica conjunta entre los índices ENSO (ONI, SOI, MEI) y la superficie de agua (Área), se ajustó un modelo VAR (Vector Autorregresivo). A diferencia de los modelos univariados como ARIMA o SARIMA, el VAR permite capturar relaciones dinámicas multivariadas, considerando que cada variable depende tanto de sus propios rezagos como de los rezagos de las demás variables del sistema \cite{lutkepohl2005new}.
+Para modelar la dinámica conjunta entre los índices ENSO (ONI, SOI, MEI) y la superficie de agua (\texttt{Área}), se ajustó un modelo VAR. A diferencia de los modelos univariados como ARIMA o SARIMA, el VAR permite capturar relaciones dinámicas multivariadas, considerando que cada variable depende tanto de sus propios rezagos como de los rezagos de las demás variables del sistema \cite{lutkepohl2005new}.
 
 \subsubsection{Selección del orden de rezagos}
 Se evaluaron los criterios de información AIC, BIC, HQIC y FPE para determinar el número óptimo de rezagos (tabla~\ref{tab:var_lags}). Los resultados muestran que el rezago $p=3$ minimiza la mayoría de los criterios (AIC, HQIC y FPE), por lo que se seleccionó un modelo VAR(3).
 
 \begin{table}[H]
     \centering
+    \begin{threeparttable}
     \caption{Selección del orden de rezagos para el modelo VAR.}
     \label{tab:var_lags}
     \begin{tabular}{lcccc}
         \toprule
         \textbf{Rezago} & \textbf{AIC} & \textbf{BIC} & \textbf{HQIC} & \textbf{FPE} \\
         \midrule
-        2 & -7,485 & -7,130$^\ast$ & -7,345 & 0,0005612 \\
-        3 & -7,617$^\ast$ & -7,104 & -7,414$^\ast$ & 0,0004921$^\ast$ \\
+        2 & -7,485 & -7,130\tnote{*} & -7,345 & 0,0005612 \\
+        3 & -7,617\tnote{*} & -7,104 & -7,414\tnote{*} & 0,0004921\tnote{*} \\
         \bottomrule
     \end{tabular}
+    \begin{tablenotes}
+      \footnotesize
+      \item [*] * Significativo al nivel del 5\% (p $<$ 0,05).
+    \end{tablenotes}
+    \end{threeparttable}
 \end{table}
+
 
 El ajuste del modelo mostró que:
 
@@ -281,7 +276,7 @@ El ajuste del modelo mostró que:
     \item ONI presenta un fuerte componente autoregresivo, con significancia en los rezagos 1 y 3, lo que confirma su persistencia temporal.
     \item SOI depende de sus propios rezagos, pero también recibe influencia significativa del ONI, reforzando los vínculos entre estos índices ENSO.
     \item MEI es explicado principalmente por sus propios rezagos, aunque también recibe influencia de ONI y SOI.
-    \item El Área muestra alta dependencia de su propio rezago inmediato (L1.Area $\approx 0,67$), lo que indica fuerte persistencia temporal. Además, se observa una influencia marginal de SOI (p$\approx 0,05$), consistente con la prueba de causalidad de Granger.
+    \item El \texttt{Área} muestra alta dependencia de su propio rezago inmediato (L1.Area $\approx 0,67$), lo que indica fuerte persistencia temporal. Además, se observa una influencia marginal de SOI (p$\approx 0,05$), consistente con la prueba de causalidad de Granger.
 \end{itemize}
 
 Por otra parte, la matriz de correlación entre los residuos (tabla~\ref{tab:var_corr_resid}) muestra que:
@@ -289,7 +284,7 @@ Por otra parte, la matriz de correlación entre los residuos (tabla~\ref{tab:var
 \begin{itemize}
     \item ONI y MEI presentan una correlación positiva alta (0,59), consistente con la interdependencia observada en los coeficientes.
     \item SOI mantiene correlaciones negativas con ONI (-0,23) y MEI (-0,45), reforzando su rol como índice atmosférico diferenciado.
-    \item El Área muestra correlaciones débiles con el resto de variables, lo que indica que sus residuos son relativamente independientes.
+    \item El \texttt{Área} muestra correlaciones débiles con el resto de variables, lo que indica que sus residuos son relativamente independientes.
 \end{itemize}
 
 
@@ -309,18 +304,18 @@ Por otra parte, la matriz de correlación entre los residuos (tabla~\ref{tab:var
     \end{tabular}
 \end{table}
 
-Por ultimo, se aplicó el test de normalidad basado en asimetría y curtosis. La hipótesis nula (H$_0$: residuos con distribución normal) fue rechazada al 5\% de significancia (p-valor=0.000). Esto indica que los residuos no son normales, presentando colas pesadas y asimetrías, una situación común en series climáticas y ambientales. Aunque no compromete la validez del VAR, sí implica que los intervalos de confianza deben interpretarse con cautela.
+Por último, se aplicó el test de normalidad basado en asimetría y curtosis. La hipótesis nula (H$_0$: residuos con distribución normal) fue rechazada al 5\% de significancia (p-valor=0,000). Esto indica que los residuos no son normales ya que presentan colas pesadas y asimetrías, una situación común en series climáticas y ambientales. Aunque no compromete la validez del VAR, sí implica que los intervalos de confianza deben interpretarse con cautela.
 
 \subsubsection{Predicciones}
-En la figura~\ref{fig:var_pred} se presentan las predicciones del modelo VAR comparadas con los valores observados. Se observa que el modelo logra capturar adecuadamente la evolución de ONI y MEI, mientras que en SOI las oscilaciones extremas resultan más difíciles de reproducir. En el caso del Área, las predicciones se mantienen dentro de un rango consistente, aunque con menor variabilidad que la observada.
+En la figura~\ref{fig:var_pred} se presentan las predicciones del modelo VAR comparadas con los valores observados. Se observa que el modelo logra capturar adecuadamente la evolución de ONI y MEI, mientras que en SOI las oscilaciones extremas resultan más difíciles de reproducir. En el caso del \texttt{Área}, las predicciones se mantienen dentro de un rango consistente, aunque con menor variabilidad que la observada.
 
 \subsubsection{Respuestas al impulso}
 Las funciones de respuesta al impulso (IRF) permiten evaluar cómo un shock en una variable afecta a las demás dentro del sistema (figura~\ref{fig:var_irf}). Los resultados indican que:
 
 \begin{itemize}
     \item Un shock positivo en ONI genera efectos persistentes en sí mismo y también incrementa los valores de MEI.
-    \item Un shock en SOI produce impactos negativos significativos sobre ONI y MEI, además de afectar el Área en los primeros periodos.
-    \item El Área responde principalmente a perturbaciones de SOI, lo que refuerza su rol como variable climática clave que influye en la superficie de agua.
+    \item Un shock en SOI produce impactos negativos significativos sobre ONI y MEI, además de afectar el \texttt{Área} en los primeros periodos.
+    \item El \texttt{Área} responde principalmente a perturbaciones de SOI, lo que refuerza su rol como variable climática clave que influye en la superficie de agua.
 \end{itemize}
 
 
@@ -345,7 +340,7 @@ El pronóstico rolling permite evaluar la capacidad de los modelos para anticipa
 
 \subsection{Resultados con SARIMA}
 
-La figura~\ref{fig:rolling_sarima} muestra el rolling forecast para la serie de Área. Se observa que el modelo sigue la dinámica general, aunque presenta limitaciones en la captura de picos abruptos.
+La figura~\ref{fig:rolling_sarima} muestra el rolling forecast para la serie de \texttt{Área}. Se observa que el modelo sigue la dinámica general, aunque presenta limitaciones en la captura de picos abruptos. El modelo SARIMA fue evaluado usando las métricas:
 
 \begin{itemize}
     \item MSE: 0,0133
@@ -365,8 +360,8 @@ Estos valores muestran un error moderado en términos absolutos (RMSE bajo), per
 
 \subsection{Resultados con VAR}
 
-El modelo VAR fue evaluado para ONI, SOI, MEI y Área, con horizonte rolling de tres rezagos (figura~\ref{fig:rolling_var}).
-
+El modelo VAR fue evaluado para ONI, SOI, MEI y \texttt{Área}, con horizonte rolling de tres rezagos (figura~\ref{fig:rolling_var}).
+La evaluación del modelo VAR dio los siguientes resultados:
 \begin{itemize}
     \item MSE: 0,0176
     \item MAE: 0,0990
@@ -382,10 +377,10 @@ El modelo VAR fue evaluado para ONI, SOI, MEI y Área, con horizonte rolling de 
 \end{figure}
 
 \subsection{Comparación del desempeño en la serie Área}
-La comparación de las métricas de la serie Área entre SARIMA y VAR muestra que ambos métodos alcanzan un desempeño satisfactorio, aunque con diferencias claras. El modelo SARIMA obtiene errores menores en todas las métricas (MSE = 0,0133; RMSE = 0,1151) frente al VAR (MSE = 0,0176; RMSE = 0,1327), lo que indica una mayor precisión en la predicción puntual. Asimismo, el MAE y el MAPE confirman la superioridad de SARIMA, reflejando que en promedio sus estimaciones se ajustan mejor a la magnitud real de la superficie de agua. No obstante, el VAR sigue mostrando un nivel de predicción aceptable, con la ventaja de modelar simultáneamente las interrelaciones con los índices ENSO, lo que lo convierte en una herramienta complementaria para analizar la dinámica conjunta del sistema climático-hidrológico.
+La comparación de las métricas de la serie \texttt{Área} entre SARIMA y VAR muestra que ambos métodos alcanzan un desempeño satisfactorio, aunque con diferencias claras. El modelo SARIMA obtiene errores menores en todas las métricas (MSE = 0,0133; RMSE = 0,1151) frente al VAR (MSE = 0,0176; RMSE = 0,1327), lo que indica una mayor precisión en la predicción puntual, ver tabla \ref{tab:comp_area}. Asimismo, el MAE y el MAPE confirman la superioridad de SARIMA, reflejando que en promedio sus estimaciones se ajustan mejor a la magnitud real de la superficie de agua. No obstante, el VAR sigue mostrando un nivel de predicción aceptable, con la ventaja de modelar simultáneamente las interrelaciones con los índices ENSO, lo que lo convierte en una herramienta complementaria para analizar la dinámica conjunta del sistema climático-hidrológico.
 \begin{table}[H]
     \centering
-    \caption{Comparación de métricas para la serie Área entre SARIMA y VAR}
+    \caption{Comparación de métricas para la serie Área entre SARIMA y VAR.}
     \label{tab:comp_area}
     \begin{tabular}{lcccc}
         \toprule
@@ -400,17 +395,17 @@ La comparación de las métricas de la serie Área entre SARIMA y VAR muestra qu
 
 \subsection{Pronóstico espacio–temporal con CNN (U-Net temporal)}
 
-Con el fin de extender el análisis hacia el futuro, se desarrolló un modelo de redes neuronales convolucionales capaz de predecir la presencia de agua en la laguna a partir de imágenes satelitales mensuales. Para ello se utilizó una variante de la arquitectura U-Net \parencite{ronneberger2015unet}, adaptada para trabajar con secuencias de meses consecutivos en lugar de imágenes aisladas. De esta manera, el modelo aprovecha tanto la información espacial (formas y patrones dentro de cada imagen) como la temporal (cómo evoluciona el agua de un mes a otro).
+Con el fin de extender el análisis hacia el futuro, se desarrolló un modelo de redes neuronales convolucionales capaz de predecir la presencia de agua en la laguna a partir de imágenes satelitales mensuales. Para ello se utilizó una variante de la arquitectura U-Net , adaptada para trabajar con secuencias de meses consecutivos en lugar de imágenes aisladas. De esta manera, el modelo aprovecha tanto la información espacial (formas y patrones dentro de cada imagen) como la temporal (cómo evoluciona el agua de un mes a otro).
 
 El procedimiento consiste en entregarle al modelo un bloque de meses previos y pedirle que estime la máscara de agua del mes siguiente. Al repetir este proceso de manera encadenada (lo que se conoce como pronóstico autoregresivo), se obtiene una proyección de la dinámica de la laguna hacia adelante en el tiempo. Las salidas del modelo son tanto mapas de probabilidad de presencia de agua como máscaras binarias (agua/no agua) tras aplicar un umbral.
 
-El entrenamiento se realizó con las series históricas de imágenes ya procesadas y normalizadas. Para evaluar su desempeño, se analizaron las curvas de pérdida en entrenamiento y validación, que mostraron una reducción estable a lo largo de las épocas. En los resultados cualitativos se observa que las predicciones del modelo reproducen coherentemente la forma y extensión de la laguna en distintos meses, mientras que la serie de área pronosticada mantiene la variabilidad temporal observada en los datos reales.
+El entrenamiento se realizó con las series históricas de imágenes ya procesadas y normalizadas. Para evaluar su desempeño, se analizaron las curvas de pérdida en entrenamiento y validación, que mostraron una reducción estable a lo largo de las épocas. En los resultados cualitativos se observa que las predicciones del modelo reproducen coherentemente la forma y extensión de la laguna en distintos meses, mientras que la serie de área pronosticada mantiene la variabilidad temporal observada en los datos reales. En la figuras \ref{fig:forecast_cnn} y \ref{fig:forecast_cnn1} se pueden apreciar las predicciones con este método. 
 
-En síntesis, este enfoque basado en aprendizaje profundo permite no sólo reconstruir el pasado de manera automática, sino también generar escenarios futuros de disponibilidad de agua en el salar, lo que constituye un aporte novedoso respecto a los métodos estadísticos utilizados en las secciones anteriores.
+En síntesis, este enfoque basado en aprendizaje profundo permite no solo reconstruir el pasado de manera automática, sino también generar escenarios futuros de disponibilidad de agua en el salar, lo que constituye un aporte novedoso respecto a los métodos estadísticos utilizados en las secciones anteriores.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.80]{Figures/forecast_cnn1.png}
+    \includegraphics[scale=0.50]{Figures/forecast_cnn1.png}
     \caption{Pronóstico del área usando CNN (Octubre 2023).}
     \label{fig:forecast_cnn}
 \end{figure}
@@ -421,23 +416,13 @@ En síntesis, este enfoque basado en aprendizaje profundo permite no sólo recon
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.30]{Figures/forecast_cnn.png}
-    \caption{Pronóstico del área usando CNN (12 meses.}
-    \label{fig:forecast_cnn}
+    \caption{Pronóstico del área usando CNN (12 meses).}
+    \label{fig:forecast_cnn1}
 \end{figure}
 
 \subsection{Arquitectura de la U-Net temporal}
 
-La arquitectura implementada corresponde a una variante de U-Net \parencite{ronneberger2015unet}, diseñada originalmente para segmentación de imágenes biomédicas y hoy ampliamente utilizada en visión por computadora. En este trabajo se adaptó la red para integrar información espacio--temporal, de manera que no solo procese la forma y extensión de la laguna en cada mes, sino también la dinámica que muestran las secuencias mensuales previas.
-
-La estructura general sigue un esquema de codificador--decodificador. En la primera parte (codificador), las imágenes de entrada ---una ventana temporal de varios meses consecutivos--- se reducen progresivamente en tamaño espacial mientras aumentan en profundidad, extrayendo representaciones de mayor nivel que capturan texturas, bordes y patrones espaciales. En la segunda parte (decodificador), la red reconstruye la resolución original combinando estas representaciones profundas con las características locales preservadas en las capas iniciales (conexiones tipo \emph{skip}). Esta estrategia permite mantener el detalle espacial de la laguna a la vez que se incorporan las dependencias temporales de la serie.
-
-La salida de la red es un mapa bidimensional de probabilidad de presencia de agua para el mes siguiente. Dicho mapa puede umbralizarse para obtener una máscara binaria agua/no agua, o interpretarse directamente como una probabilidad espacial continua. En este trabajo se empleó una función de pérdida compuesta que combina \emph{binary cross entropy} y \emph{dice loss}, equilibrando la precisión en la clasificación pixel a pixel con la coherencia en la forma segmentada.
-
-En la figura~\ref{fig:curva_unet} se presentan las curvas de pérdida durante el entrenamiento de la U-Net temporal. Se observa un descenso inicial pronunciado en las primeras épocas (1--5), donde la pérdida de entrenamiento disminuye de manera marcada, evidenciando la rápida captura de patrones relevantes. De forma consistente, la pérdida de validación también se reduce, indicando que el modelo logra generalizar a los datos no vistos.
-
-A partir de la época 6, ambas curvas muestran una meseta con pequeñas oscilaciones, estabilizándose en torno a valores de $0.14$ para la validación y $0.087$--$0.089$ para el entrenamiento. La brecha entre ambas es reducida, lo que sugiere que no se presentan problemas significativos de sobreajuste. 
-
-En síntesis, el modelo alcanzó un buen equilibrio entre aprendizaje y generalización, con resultados estables y consistentes. Como trabajo futuro, podrían explorarse ajustes finos (mayor número de épocas, uso de \emph{learning rate schedulers} o variación del \emph{batch size}) para mejorar aún más la estabilidad de la validación.
+La arquitectura implementada corresponde a una variante de U-Net, adaptada para integrar secuencias mensuales de imágenes y generar predicciones espacio–temporales de la cobertura de agua. En este trabajo, la red se entrenó con ventanas de meses consecutivos y produjo como salida mapas de probabilidad de presencia de agua para el mes siguiente, que luego se umbralizaron para obtener máscaras binarias. El entrenamiento mostró curvas estables de pérdida, con valores finales bajos tanto en entrenamiento como en validación (figura~\ref{fig:curva_unet}), lo que evidencia una buena capacidad de generalización. En síntesis, la U-Net temporal permitió derivar series continuas de área de agua con coherencia espacio–tiempo, aportando una herramienta robusta para el pronóstico hidrológico del Salar de Llullaillaco.
 
 \begin{figure}[H]
     \centering
@@ -447,7 +432,6 @@ En síntesis, el modelo alcanzó un buen equilibrio entre aprendizaje y generali
 \end{figure}
 
 
-En síntesis, la U-Net temporal permite capturar patrones complejos de variación espacial y temporal, ofreciendo una herramienta flexible para el pronóstico de la cobertura de agua en la laguna del Salar de Llullaillaco.
 
 
 %----------------------------------------------------------------------------------------
@@ -457,30 +441,34 @@ En síntesis, la U-Net temporal permite capturar patrones complejos de variació
 A continuación se detallan las principales limitaciones,  supuestos y riesgo del trabajo realizado.
 
 \subsection{Cobertura y calidad de datos}
+Respecto de la cobertura temporal, espacial y a la calidad de los datos, se pueden mencionar las siguientes limitaciones:
 \begin{itemize}
     \item Brechas temporales y SLC-off: la falla del Scan Line Corrector (SLC) en Landsat 7 (post mayo 2003) y la transición 2012–2013 generaron huecos relevantes. Se mitigó con una estrategia híbrida (interpolación en brechas cortas y promedio estacional en brechas largas), pero persiste incertidumbre residual en esos intervalos.
     \item Máscaras y umbrales: la detección de agua depende del umbral NDWI ($>0.2$). Cambios razonables en el umbral o en el tratamiento de nubes/sombras pueden modificar el área estimada (sensibilidad a parámetros).
-    \item Validación in situ: no hubo verificación de campo, por lo que los umbrales y parámetros se justifican con literatura y coherencia interna; esto limita la cuantificación del sesgo absoluto.
+    \item Validación \textit{in situ}: no hubo verificación de campo, por lo que los umbrales y parámetros se justifican con literatura y coherencia interna; esto limita la cuantificación del sesgo absoluto.
 \end{itemize}
 
 \subsection{Supuestos estadísticos y diagnóstico de modelos}
+Respecto de los modelos usados se mencionan las siguientes limitaciones asociadas a sus supuestos: 
 \begin{itemize}
-    \item Estacionariedad: ONI, SOI y MEI resultaron estacionarios por ADF, mientras que Área requirió diferenciación. El cumplimiento de estacionariedad es condición para SARIMA/VAR; desvíos locales pueden degradar el desempeño.
+    \item Estacionariedad: ONI, SOI y MEI resultaron estacionarios por ADF, mientras que \texttt{Área} requirió diferenciación. El cumplimiento de estacionariedad es condición para SARIMA/VAR; desvíos locales pueden degradar el desempeño.
     \item Normalidad y heterocedasticidad de residuos: varios modelos (por ejemplo, ONI y MEI en SARIMA, y el VAR) muestran residuos no normales (colas pesadas) y, en casos, heterocedasticidad. Los intervalos de confianza deben interpretarse con cautela.
     \item Linealidad: Granger y VAR asumen relaciones lineales. Posibles no linealidades (o cambios de régimen) no modeladas pueden explicar parte del error, especialmente en picos del SOI.
     \item Métricas: el MAPE es poco informativo cuando hay valores cercanos a cero (índices ENSO). Se priorizaron RMSE/MAE y diagnóstico de residuos.
 \end{itemize}
 
 \subsection{Observaciones clave sobre resultados}
+Como principales hallazgos en los resultados se mencionan:
 \begin{itemize}
-    \item Serie Área: la diferenciación mejoró la robustez y redujo el error validando el preprocesamiento.
-    \item ENSO: fuerte interdependencia entre ONI, SOI y MEI (Granger), con un rol central del SOI sobre Área. El VAR confirmó persistencia propia de cada índice y efectos cruzados coherentes con la física climática.
+    \item Serie \texttt{Área}: la diferenciación mejoró la robustez y redujo el error validando el preprocesamiento.
+    \item ENSO: fuerte interdependencia entre ONI, SOI y MEI (Granger), con un rol central del SOI sobre \texttt{Área}. El VAR confirmó persistencia propia de cada índice y efectos cruzados coherentes con la física climática.
     \item SOI: aunque los residuos no presentan autocorrelación relevante, las métricas de error del modelo SARIMA fueron altas respecto de su escala, sugiriendo simplificación y/o modelos alternativos (por ejemplo, con heterocedasticidad).
     \item Segmentación con U-Net: el etiquetado automático mediante la red permitió generar una serie temporal estable sin necesidad de anotación manual, aunque con limitaciones en la cuantificación de métricas exhaustivas de segmentación.
 \end{itemize}
 
 
 \subsection{Riesgos y mitigaciones}
+Como principales riesgos y medidas de mitigación asociados a la modelación se detallan:
 \begin{itemize}
     \item Dependencia de GEE y catálogos: fallos de disponibilidad pueden afectar la reproducibilidad. Mitigación: exportaciones imágenes.
     \item Sesgo por agregación espacial: el foco en la laguna central puede omitir dinámicas periféricas. Mitigación: probar la metodologia en otros sectores del salar.
@@ -494,42 +482,9 @@ A continuación se detallan las principales limitaciones,  supuestos y riesgo de
 %----------------------------------------------------------------------------------------
 \section{Cumplimiento de requerimientos}
 
-A continuación se presenta el seguimiento del cumplimiento respecto de los requisitos definidos en la planificación. El estado se asigna con base en los desarrollos y resultados documentados (GEE/Colab, series temporales, SARIMA/VAR, visualizaciones y reportes).
+El seguimiento de los requisitos definidos en la planificación muestra que se cumplieron satisfactoriamente en su mayoría. Entre ellos se incluyen: (i) descarga y procesamiento de datos satelitales desde GEE, (ii) modelado y predicción con SARIMA y VAR en tiempos operativos adecuados, (iii) visualización de mapas y series temporales, (iv) cálculo eficiente del NDWI, (v) métricas de precisión en la detección de agua, (vi) compatibilidad con formatos estándar (GeoTIFF y Shapefile), (vii) documentación técnica, y (viii) generación de reportes claros para usuarios. 
 
-\begin{table}[H]
-\centering
-\caption{Seguimiento de requisitos del proyecto}
-\label{tab:requisitos_cumplimiento}
-\resizebox{\textwidth}{!}{
-\begin{tabular}{p{2cm} p{3cm} p{9cm}}
-\toprule
-Req. & Estado & Detalle \\
-\midrule
-\#1 & Cumple  & Descarga y procesamiento continuo desde GEE. \\
- & & Evidencia: pipelines en GEE con filtrado de nubes y exportación; brechas históricas (SLC-off, 2012–2013) cubiertas con imputación. \\
-\#2 & Cumple & Modelos IA predicen en menos de 24 h. \\
- & & Evidencia: SARIMA/VAR ejecutan en horas sobre dataset mensual; validado en Colab. \\
-\#3 & Cumple & Visualización de mapas y series temporales. \\
- & & Evidencia: mapas de ocurrencia e índices ACF/PACF y predicciones incluidos en resultados. \\
-\#4 & Cumple & Cálculo de NDWI en menos de 30 min por lote. \\
- & & Evidencia: en lotes representativos se cumple; falta protocolo formal de benchmark. \\
-\#5 & Cumple & Precisión mínima 80\% en disponibilidad de agua. \\
- & & Evidencia: métricas RMSE/MAE favorables para Área/Área\_diff; falta métrica categórica y validación externa. \\
-\#6 & Cumple & Compatibilidad con GeoTIFF y Shapefile. \\
- & & Evidencia: recortes vectoriales y exportaciones desde GEE. \\
-\#7 & Cumple & Documentación técnica detallada. \\
- & & Evidencia: metodología y apéndices en desarrollo; resta manual de usuario. \\
-\#8 & Pendiente & Pruebas con Sentinel-2. \\
- & & Evidencia: validación cruzada multi-sensor planificada; aún no ejecutada. \\
-\#9 & Cumple & Cumplimiento de políticas GEE académicas. \\
- & & Evidencia: uso no comercial, citación de colecciones, límites de cuota. \\
-\#10 & Cumple & Reportes claros para usuarios. \\
- & & Evidencia: resumen ejecutivo y tablas listos; falta consolidar executive brief y anexo metodológico. \\
-\bottomrule
-\end{tabular}
-}
-\end{table}
+El único requisito pendiente corresponde a las pruebas con imágenes Sentinel-2, cuya validación cruzada se encuentra planificada pero aún no ejecutada. En síntesis, los requerimientos operativos de datos, modelado y visualización se encuentran cumplidos o muy avanzados, con un alto grado de replicabilidad.
 
-Los requisitos operativos de datos, modelado y visualización se encuentran cumplidos o muy avanzados. Permanecen en progreso las pruebas con Sentinel-2 (Req.\,\#8).
 
 

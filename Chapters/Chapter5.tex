@@ -3,7 +3,7 @@
 \chapter{Conclusiones} % Main chapter title
 
 \label{Chapter5} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
-Este capítulo presenta las conclusiones generales del trabajo, resumiendo los aportes más relevantes obtenidos y el grado de cumplimiento de los objetivos planteados. Asimismo, se incluyen observaciones sobre la planificación y los riesgos, y se señalan posibles líneas de desarrollo futuro. 
+Este capítulo presenta las conclusiones generales del trabajo, los aportes más relevantes obtenidos y describe el grado de cumplimiento de los objetivos planteados. Asimismo, se incluyen observaciones sobre la planificación y los riesgos, y se señalan posibles líneas de desarrollo futuro. 
 
 %----------------------------------------------------------------------------------------
 %	SECTION 1
@@ -24,7 +24,7 @@ A partir de la planificación inicial y las pruebas desarrolladas, se alcanzaron
     \item Los modelos SARIMA mostraron buen ajuste, destacándose la serie diferenciada de Área con residuos consistentes con ruido blanco; el SOI resultó más complejo de modelar por su alta variabilidad.
     \item El modelo VAR(3) capturó interdependencias multivariadas entre ONI, SOI y MEI, confirmando la influencia significativa del SOI sobre el Área, resultado reforzado por la prueba de causalidad de Granger y las respuestas al impulso.
     \item Se realizaron pronósticos mediante \emph{rolling forecast} con SARIMA y VAR, validando la capacidad predictiva de ambas metodologías y evidenciando limitaciones en la captura de picos extremos.
-    \item Se cumplió la mayoría de los requisitos planteados en la planificación: construcción de series homogéneas, modelado SARIMA/VAR, segmentación automática con U-Net, validación de resultados y visualización. Permanecen en progreso las métricas de precisión categórica y las pruebas cruzadas con Sentinel-2.
+    \item Se cumplieron la mayoría de los requisitos planteados en la planificación: construcción de series homogéneas, modelado SARIMA/VAR, segmentación automática con U-Net, validación de resultados y visualización. Permanecen en progreso las métricas de precisión categórica y las pruebas cruzadas con Sentinel-2.
     \item Los riesgos identificados (brechas satelitales, errores en índices) no se materializaron de manera crítica; las medidas de mitigación fueron efectivas, aunque la alta variabilidad del SOI y la necesidad de preprocesamiento riguroso se mantuvieron como los principales desafíos.
 \end{itemize}
 
