@@ -121,7 +121,7 @@ El análisis se llevó a cabo con el modelo SARIMA$(2,0,1)\times(1,1,2)_{12}$ (A
 Los coeficientes no estacionales AR(2) y MA(1) resultaron altamente significativos, lo que permitió capturar de manera adecuada la dinámica de corto plazo. En contraste, los términos estacionales no alcanzaron significancia estadística. El test de Jarque--Bera rechazó la hipótesis de normalidad y se detectó heterocedasticidad; sin embargo, los residuos no mostraron autocorrelaciones relevantes.  
 En el conjunto de datos de prueba, las métricas de desempeño fueron MSE $=0.683$, MAE $=0.631$ y RMSE $=0.826$. En las figuras~\ref{fig:res_oni} y~\ref{fig:pred_oni} se ilustran los residuos del modelo y las predicciones sobre el set de test.  
 
-Conclusión: el modelo logra un buen ajuste de la dinámica no estacional; se recomienda simplificar la parte estacional (evaluar un ARIMA$(2,0,1)$ sin componente estacional) y volver a examinar los residuos.  
+Observación: el modelo logra un buen ajuste de la dinámica no estacional; se recomienda simplificar la parte estacional (evaluar un ARIMA$(2,0,1)$ sin componente estacional) y volver a examinar los residuos.  
 \vspace{0.3em}
 
 
@@ -130,7 +130,7 @@ El análisis de la serie SOI se realizó mediante el modelo SARIMA$(1,0,2)\times
 Los parámetros AR(1), MA(1) y varios términos estacionales resultaron significativos, mientras que el MA(2) y el AR estacional a 24 meses no lo fueron. Los residuos no evidenciaron autocorrelación (test Ljung--Box con $p>0.05$), aunque presentaron una ligera desviación respecto de la normalidad.  
 En el conjunto de prueba, las métricas obtenidas fueron MSE $=88.00$, MAE $=7.64$ y RMSE $=9.38$. Las figuras~\ref{fig:res_soi} y~\ref{fig:pred_soi} muestran tanto los residuos como las predicciones en el set de validación.  
 
-Conclusión: el modelo presenta un desempeño predictivo limitado en relación con la escala del SOI. Resulta conveniente simplificar la estructura, eliminando términos no significativos y explorando transformaciones más robustas.  
+Observación: el modelo presenta un desempeño predictivo limitado en relación con la escala del SOI. Resulta conveniente simplificar la estructura, eliminando términos no significativos y explorando transformaciones más robustas.  
 \vspace{0.3em}
 
 
@@ -139,7 +139,7 @@ La serie MEI fue modelada mediante un SARIMA$(2,0,2)\times(1,1,2)_{12}$ (AIC $\a
 Los coeficientes no estacionales AR(1), AR(2) y MA(1) mostraron gran significancia, mientras que MA(2) se comportó de manera marginal. En la componente estacional, únicamente el término AR a 12 meses resultó relevante, mientras que los términos MA estacionales no aportaron significativamente. Los residuos no evidenciaron autocorrelación (Ljung--Box con $p\approx 0,84$), aunque presentaron colas algo pesadas.  
 En el conjunto de prueba se obtuvieron las métricas: MSE $=0.821$, MAE $=0.725$ y RMSE $=0.906$. Las figuras~\ref{fig:res_mei} y~\ref{fig:pred_mei} presentan los residuos y las predicciones sobre el set de test.  
 
-Conclusión: el modelo ofrece un desempeño predictivo sólido. En futuros trabajos sería apropiado simplificar la parte estacional (p.\,ej., SARIMA$(2,0,1)\times(1,1,0)_{12}$) y revisar nuevamente el comportamiento de los residuos.  
+Observación: el modelo ofrece un desempeño predictivo sólido. En futuros trabajos sería apropiado simplificar la parte estacional (p.\,ej., SARIMA$(2,0,1)\times(1,1,0)_{12}$) y revisar nuevamente el comportamiento de los residuos.  
 \vspace{0.3em}
 
 
@@ -148,7 +148,7 @@ La serie \texttt{Área}, sin diferenciación, se ajustó con un modelo SARIMA$(1
 Todos los coeficientes estimados resultaron significativos, destacándose un coeficiente AR estacional elevado ($\approx 0.996$), lo que sugiere la conveniencia de considerar diferenciación estacional. Los residuos no mostraron autocorrelaciones relevantes, aunque presentaron cierta desviación respecto de la normalidad.  
 En el conjunto de datos de prueba, los resultados fueron MSE $=0.02499$, MAE $=0.119$ y RMSE $=0.158$. Las figuras~\ref{fig:res_area} y~\ref{fig:pred_area} ilustran tanto los residuos como las predicciones generadas por el modelo.  
 
-Conclusión: el ajuste es adecuado en la escala de la serie; no obstante, la elevada magnitud del AR estacional sugiere evaluar un $D=1$ para garantizar mayor estabilidad.  
+Observación: el ajuste es adecuado en la escala de la serie; no obstante, la elevada magnitud del AR estacional sugiere evaluar un $D=1$ para garantizar mayor estabilidad.  
 \vspace{0.3em}
 
 
@@ -158,7 +158,7 @@ Los residuos se comportaron como ruido blanco (ACF/PACF dentro de las bandas de 
 En el conjunto de prueba, el desempeño fue particularmente destacable: MSE $=0.01782$, MAE $=0.0910$, RMSE $=0.1335$ y MAPE $=1.70\%$. En las figuras~\ref{fig:res_area_d} y~\ref{fig:pred_area_d} se visualizan los residuos y las predicciones en el set de test.
 
 
-Conclusión: el modelo muestra un comportamiento predictivo muy satisfactorio. A futuro, podría considerarse una estructura aún más parsimoniosa y realizar verificaciones adicionales de los residuos.  
+Observación: el modelo muestra un comportamiento predictivo muy satisfactorio. A futuro, podría considerarse una estructura aún más parsimoniosa y realizar verificaciones adicionales de los residuos.  
 \vspace{0.3em}
 
 
@@ -401,7 +401,7 @@ El procedimiento consiste en entregarle al modelo un bloque de meses previos y p
 
 El entrenamiento se realizó con las series históricas de imágenes ya procesadas y normalizadas. Para evaluar su desempeño, se analizaron las curvas de pérdida en entrenamiento y validación, que mostraron una reducción estable a lo largo de las épocas. En los resultados cualitativos se observa que las predicciones del modelo reproducen coherentemente la forma y extensión de la laguna en distintos meses, mientras que la serie de área pronosticada mantiene la variabilidad temporal observada en los datos reales. En la figuras \ref{fig:forecast_cnn} y \ref{fig:forecast_cnn1} se pueden apreciar las predicciones con este método. 
 
-En síntesis, este enfoque basado en aprendizaje profundo permite no solo reconstruir el pasado de manera automática, sino también generar escenarios futuros de disponibilidad de agua en el salar, lo que constituye un aporte novedoso respecto a los métodos estadísticos utilizados en las secciones anteriores.
+Este enfoque basado en aprendizaje profundo permite no solo reconstruir el pasado de manera automática, sino también generar escenarios futuros de disponibilidad de agua en el salar, lo que constituye un aporte novedoso respecto a los métodos estadísticos utilizados en las secciones anteriores.
 
 \begin{figure}[H]
     \centering

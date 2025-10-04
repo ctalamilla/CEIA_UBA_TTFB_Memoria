@@ -85,7 +85,7 @@ Para este trabajo se emplearon imágenes ópticas de las misiones \Landsat 5 TM 
 
 Estas imágenes corresponden a productos de nivel 2, que incluyen correcciones atmosféricas (Surface Reflectance) y enmascaramiento de nubes mediante algoritmos QA/QC. Se seleccionaron todas las escenas disponibles y se priorizaron aquellas sin nubes y con cobertura adecuada del Salar de Llullaillaco.
 
-Las bandas empleadas en los cálculos de índices espectrales fueron:
+Las bandas empleadas en los cálculos de índices espectrales se muestran en la tabla \ref{tab:landsat_bandas}.
 
 \begin{table}[H]
 \centering
@@ -136,22 +136,20 @@ En este trabajo el teacher se genera con imágenes Landsat con control de nubosi
 
 Para sección \textit{Student} (U-Net) empleamos una U-Net 2D estándar con \emph{skip connections}. La entrada es una imagen multicanal y la salida es una binaria de agua/no-agua. 
 
-En el trabajo \cite{DeepAqua2023} la entrada es SAR (C-band) y el modelo aprende a partir del teacher óptico (máscara binaria a partir de NDWI). En nuestra adaptación usamos bandas ópticas Landsat (SR5--SR4--SR3) como entrada, manteniendo la misma función objetivo y protocolo de entrenamiento. Esta variante conserva las ventajas de KD (eliminar rotulado manual) y simplifica la disponibilidad operativa de imágenes SAR.
+En el trabajo \cite{DeepAqua2023} la entrada es SAR (C-band) y el modelo aprende a partir del teacher óptico (máscara binaria a partir de NDWI). En nuestra adaptación usamos bandas ópticas Landsat (SR5--SR4--SR3) como entrada, manteniendo la misma función objetivo y protocolo de entrenamiento. Esta variante conserva las ventajas de KD (eliminar rotulado manual) y simplifica la disponibilidad operativa de imágenes SAR. En la figura \ref{fig:kd-water} se muestra el esquema usando en el trabajo referenciado. 
+
+De esta manera, el KD reduce la dependencia de rótulos manuales, mejora la robustez ante variabilidad espectral y permite operación \emph{near real-time}. En \cite{DeepAqua2023} se reportan mejoras en IoU/F1 frente a métodos puramente no supervisados y capacidad para capturar agua abierta y vegetada; en nuestra adaptación óptica, el comportamiento esperado es comparable en escenas despejadas, con el costo de una mayor sensibilidad a nubosidad (mitigado vía filtrado y composición mensual).
 
 % --- Figura (opcional) ---
-\begin{figure}[t]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.7]{Figures/KD_deepaqua.jpg}
   \caption{Esquema de distillation para segmentación de agua. Arriba: enfoque tradicional con anotación manual. Abajo: enfoque teacher - student con U-Net. \protect\footnotemark.}
   \label{fig:kd-water}
 \end{figure}
-\FloatBarrier 
+
 
 \footnotetext{Imagen tomada de \cite{DeepAqua2023}.}
-
-De esta manera el KD reduce la dependencia de rótulos manuales, mejora la robustez ante variabilidad espectral y permite operación \emph{near real-time}. En \cite{DeepAqua2023} se reportan mejoras en IoU/F1 frente a métodos puramente no supervisados y capacidad para capturar agua abierta y vegetada; en nuestra adaptación óptica, el comportamiento esperado es comparable en escenas despejadas, con el costo de una mayor sensibilidad a nubosidad (mitigado vía filtrado y composición mensual).
-
-
 
 \subsection*{Variables climáticas ENSO}
 

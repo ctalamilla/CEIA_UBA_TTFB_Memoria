@@ -219,7 +219,7 @@ Esta sección presenta el tratamiento realizado sobre los datos satelitales y cl
 Se emplearon imágenes de las misiones Landsat 5 TM y Landsat 8 OLI (productos de nivel 2 en Google Earth Engine), restringidas al polígono del Salar de Llullaillaco, con cobertura nubosa menor al 20\% y enmascaradas para remover nubes y sombras. Landsat 5 fue la fuente principal de datos entre 1985 y 2011, mientras que Landsat 8 se utilizó para el período 2013–2024. La misión Landsat 7 ETM+ se descartó en gran medida debido a la falla del \textit{Scan Line Corrector} ocurrida en 2003, que afectó la calidad geométrica de sus imágenes.
 
 
-En la figura ~\ref{fig:cob_temporal} y en la tabla ~\ref{tab:periodos_landsat} se muestran los períodos de tiempo usados. Es necesario mencionar que debido a la superposición entre Landsat 5 TM y Landsat 7 ETM+ se decidió trabajar solo con Landsat 5 TM y Landsat 8 OLI. Se generó una brecha sin imágenes de 12 meses entre febrero de 2012 y febrero de 2013.
+En la figura~\ref{fig:cob_temporal} y en la tabla~\ref{tab:periodos_landsat} se muestran los períodos de tiempo usados. Es necesario mencionar que debido a la superposición entre Landsat 5 TM y Landsat 7 ETM+ se decidió trabajar solo con Landsat 5 TM y Landsat 8 OLI. Se generó una brecha sin imágenes de 12 meses entre febrero de 2012 y febrero de 2013.
 
 \begin{figure}[ht]
         \centering
@@ -229,7 +229,7 @@ En la figura ~\ref{fig:cob_temporal} y en la tabla ~\ref{tab:periodos_landsat} s
         \label{fig:cob_temporal}
 \end{figure}
 
-En resumen, la elección de misiones respondió a un compromiso entre calidad geométrica, continuidad temporal y cobertura atmosférica. Además,  se priorizó la robustez de las series en períodos relevantes para el análisis hidrológico del salar. En la figura ~\ref{fig:cant_imagenes} y en la tabla ~\ref{tab:periodos_landsat} se muestra la cantidad de imagenes usadas. 
+La elección de misiones respondió a un compromiso entre calidad geométrica, continuidad temporal y cobertura atmosférica. Además,  se priorizó la robustez de las series en períodos relevantes para el análisis hidrológico del salar. En la figura ~\ref{fig:cant_imagenes} y en la tabla ~\ref{tab:periodos_landsat} se muestra la cantidad de imágenes usadas. 
 
 
 \begin{table}[h]
@@ -251,11 +251,8 @@ En resumen, la elección de misiones respondió a un compromiso entre calidad ge
 \subsection{Construcción del cubo temporal (xarray) desde GEE}
 A partir de las consultas en Google Earth Engine (GEE), las colecciones Landsat fueron descargadas y organizadas localmente en un \emph{cubo de datos} espacio–temporal mediante \texttt{xarray}. Este cubo preserva la indexación temporal (fecha) y espacial (filas/columnas) y permite operaciones vectorizadas para apilado, reproyección y enmascaramiento de calidad. En la figura~\ref{fig:agg_mens} se presenta un ejemplo de 4 imágenes dentro del cubo de datos y en la figura~\ref{fig:img_mens_agg} se presenta un ejemplo de cómo trabaja el cubo de datos en las agregaciones temporales.
 
-\subsection{Agregación mensual e imputación de meses faltantes}
-El cubo diario de imagen inicial fue agregado a escala \emph{mensual} (mediana de reflectancia) para homogeneizar la frecuencia de análisis. Dado que algunos meses carecían de imágenes válidas (ver figura~\ref{fig:conteo_datos}), se generó un cubo mensual \emph{imputado} aplicando la estrategia de promedio mensual histórico para imágenes mensuales ausentes. El resultado es un cubo mensual continuo que sostiene las etapas posteriores de segmentación y series temporales. En el apéndice \ref{AppendixA} se presentan las imágenes mensuales (mediana) dentro del cubo de datos~\ref{fig:img_mens}.
 
-
-\begin{figure}[ht]
+\begin{figure}[H]
         \centering
         \includegraphics[scale=.25]
         {Figures/agg_mens.png}
@@ -263,7 +260,7 @@ El cubo diario de imagen inicial fue agregado a escala \emph{mensual} (mediana d
         \label{fig:agg_mens}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[H]
         \centering
         \includegraphics[scale=.25]
         {Figures/cube.png}
@@ -272,7 +269,8 @@ El cubo diario de imagen inicial fue agregado a escala \emph{mensual} (mediana d
 \end{figure}
 
 
-
+\subsection{Agregación mensual e imputación de meses faltantes}
+El cubo diario de imagen inicial fue agregado a escala \emph{mensual} (mediana de reflectancia) para homogeneizar la frecuencia de análisis. Dado que algunos meses carecían de imágenes válidas (ver figura~\ref{fig:conteo_datos}), se generó un cubo mensual \emph{imputado} aplicando la estrategia de promedio mensual histórico para imágenes mensuales ausentes. El resultado es un cubo mensual continuo que sostiene las etapas posteriores de segmentación y series temporales. En el apéndice \ref{AppendixA} se presentan las imágenes mensuales (mediana) dentro del cubo de datos~\ref{fig:img_mens}.
 
 \section{Segmentación de las imágenes}
 
@@ -366,8 +364,8 @@ En la figura ~\ref{fig:ts_final} se muestran las series temporales resultantes.
         \caption{Series temporales procesadas.}
         \label{fig:ts_final}
 \end{figure}
-\FloatBarrier 
  
+\newpage 
 \section{Exploración y tratamiento de las series temporales}
 En esta sección se realiza una exploración de las variables consideradas. Además, se realizan análisis visuales y comparaciones entre las variables. 
 
@@ -539,14 +537,14 @@ De acuerdo a los resultados precedentes es posible resumir las métricas en lo s
 
 
 
-Como conclusión general, se puede mencionar que las series climáticas (ONI, SOI, MEI) muestran 
+Como observación general, se puede mencionar que las series climáticas (ONI, SOI, MEI) muestran 
 estacionariedad con memoria corta, modelables con AR(1), AR(2). En contraste, la serie 
 Área no es estacionaria y requiere diferenciación previa; tras este paso, un modelo AR(1) 
 o SARIMA con estacionalidad anual resulta más adecuado.
 
 \subsection{Tratamiento de la serie Área mediante diferenciación}
 
-Dado que la serie Área presentó una clara tendencia y solo una estacionariedad débil según 
+Dado que la serie \texttt{Área} presentó una clara tendencia y solo una estacionariedad débil según 
 el test ADF, se aplicó una primera diferenciación (I=1) para eliminar la deriva temporal. 
 El análisis posterior de autocorrelación mostró un comportamiento mucho más estable, con 
 valores de FAC y FACP cercanos a cero en los primeros rezagos, y ausencia de patrones de 
